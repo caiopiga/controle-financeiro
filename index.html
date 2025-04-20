@@ -1,18 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-<!-- Firebase SDK - Adicione essas linhas -->
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-<!-- Fim da adição Firebase SDK -->
-
-<style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Controle Financeiro</title>
@@ -732,35 +720,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 </head>
 <body>
-<body>
-    <!-- Início da adição - Modal de Login -->
-    <div id="loginModal" class="modal" style="display: block;">
-        <div class="modal-content" style="max-width: 400px;">
-            <h2><i class="fas fa-lock"></i> Acesso ao Controle Financeiro</h2>
-            <form id="form-login" style="margin-top: 1.5rem;">
-                <div class="form-group">
-                    <label for="email">E-mail</label>
-                    <input type="email" id="email" required placeholder="seu@email.com">
-                </div>
-                
-                <div class="form-group">
-                    <label for="senha">Senha</label>
-                    <input type="password" id="senha" required placeholder="Sua senha">
-                </div>
-                
-                <div style="display: flex; gap: 0.5rem; margin-top: 1.5rem;">
-                    <button type="button" id="btn-entrar" style="flex: 1;">
-                        <i class="fas fa-sign-in-alt"></i> Entrar
-                    </button>
-                    <button type="button" id="btn-cadastrar" style="flex: 1; background-color: var(--warning-color);">
-                        <i class="fas fa-user-plus"></i> Cadastrar
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-    <!-- Fim da adição - Modal de Login -->
-
     <div class="container">
         <div class="header">
             <h1><i class="fas fa-wallet"></i> Controle Financeiro</h1>
@@ -1134,456 +1093,198 @@
     </div>
 
     <script>
-// Configuração do Firebase
-const firebaseConfig = {
-    apiKey: "AIzaSyDrX-5eAXYafyLDZKwD4uu5Q7gEiAUxwA0",
-    authDomain: "controle-financeiro-piga.firebaseapp.com",
-    projectId: "controle-financeiro-piga",
-    storageBucket: "controle-financeiro-piga.appspot.com",
-    messagingSenderId: "223566178286",
-    appId: "1:223566178286:web:8d2fe51d3e0f0a5ebc98e9"
-};
+        // Variáveis para armazenar os dados
+        let lancamentos = JSON.parse(localStorage.getItem('lancamentos')) || [];
+        let configuracoes = JSON.parse(localStorage.getItem('configuracoes')) || {
+            salario1: 0,
+            salario2: 0,
+            aluguel: 0,
+            valeTransporte: 0,
+            gympass: 0,
+            cabelo: 0,
+            corinthians: 0,
+            psn: 0,
+            anuidade: 0,
+            investimentoDia15: 0,
+            investimentoDia30: 0
+        };
 
-// Inicializar Firebase
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const auth = firebase.auth();
+        // Referência ao modal de edição
+        const modal = document.getElementById('editModal');
+        const closeModal = document.querySelector('.close');
 
-// Variáveis para armazenar os dados
-let userId = null;
-let lancamentos = [];
-let configuracoes = {
-    salario1: 0,
-    salario2: 0,
-    aluguel: 0,
-    valeTransporte: 0,
-    gympass: 0,
-    cabelo: 0,
-    corinthians: 0,
-    psn: 0,
-    anuidade: 0,
-    investimentoDia15: 0,
-    investimentoDia30: 0
-};
-
-// Referência ao modal de edição e login
-const modal = document.getElementById('editModal');
-const loginModal = document.getElementById('loginModal');
-const closeModal = document.querySelector('.close');
-
-// Função para formatar valor em Real
-function formatarMoeda(valor) {
-    return 'R$ ' + valor.toFixed(2).replace('.', ',');
-}
-
-// Função para mostrar mensagem de loading
-function mostrarLoading(mensagem = 'Carregando...') {
-    const loadingDiv = document.createElement('div');
-    loadingDiv.id = 'loading-overlay';
-    loadingDiv.style.position = 'fixed';
-    loadingDiv.style.top = '0';
-    loadingDiv.style.left = '0';
-    loadingDiv.style.width = '100%';
-    loadingDiv.style.height = '100%';
-    loadingDiv.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-    loadingDiv.style.display = 'flex';
-    loadingDiv.style.justifyContent = 'center';
-    loadingDiv.style.alignItems = 'center';
-    loadingDiv.style.zIndex = '9999';
-    
-    const spinner = document.createElement('div');
-    spinner.style.backgroundColor = 'white';
-    spinner.style.padding = '20px';
-    spinner.style.borderRadius = '10px';
-    spinner.style.textAlign = 'center';
-    spinner.innerHTML = `
-        <div class="spinner" style="border: 4px solid rgba(0,0,0,.1); width: 36px; height: 36px; border-radius: 50%; border-left-color: var(--primary-color); animation: spin 1s linear infinite; margin: 0 auto 10px;"></div>
-        <div>${mensagem}</div>
-    `;
-    
-    loadingDiv.appendChild(spinner);
-    document.body.appendChild(loadingDiv);
-    
-    // Adicionar a animação de spinner
-    const style = document.createElement('style');
-    style.innerHTML = `
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        // Função para formatar valor em Real
+        function formatarMoeda(valor) {
+            return 'R$ ' + valor.toFixed(2).replace('.', ',');
         }
-    `;
-    document.head.appendChild(style);
-}
 
-// Função para esconder loading
-function esconderLoading() {
-    const loadingDiv = document.getElementById('loading-overlay');
-    if (loadingDiv) {
-        document.body.removeChild(loadingDiv);
-    }
-}
-
-// Autenticação de usuário
-document.getElementById('btn-entrar').addEventListener('click', function() {
-    const email = document.getElementById('email').value;
-    const senha = document.getElementById('senha').value;
-    
-    if (!email || !senha) {
-        alert('Por favor, preencha todos os campos');
-        return;
-    }
-    
-    mostrarLoading('Fazendo login...');
-    auth.signInWithEmailAndPassword(email, senha)
-        .then(() => {
-            loginModal.style.display = 'none';
-            esconderLoading();
-        })
-        .catch(error => {
-            esconderLoading();
-            if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-                alert('Email ou senha incorretos');
-            } else {
-                alert('Erro ao fazer login: ' + error.message);
-            }
-        });
-});
-
-document.getElementById('btn-cadastrar').addEventListener('click', function() {
-    const email = document.getElementById('email').value;
-    const senha = document.getElementById('senha').value;
-    
-    if (!email || !senha) {
-        alert('Por favor, preencha todos os campos');
-        return;
-    }
-    
-    if (senha.length < 6) {
-        alert('A senha deve ter pelo menos 6 caracteres');
-        return;
-    }
-    
-    mostrarLoading('Criando conta...');
-    auth.createUserWithEmailAndPassword(email, senha)
-        .then(() => {
-            loginModal.style.display = 'none';
-            esconderLoading();
-            alert('Conta criada com sucesso!');
-        })
-        .catch(error => {
-            esconderLoading();
-            if (error.code === 'auth/email-already-in-use') {
-                alert('Este email já está em uso');
-            } else {
-                alert('Erro ao criar conta: ' + error.message);
-            }
-        });
-});
-
-// Monitorar estado de autenticação
-auth.onAuthStateChanged(user => {
-    if (user) {
-        userId = user.uid;
-        loginModal.style.display = 'none';
-        
-        // Carregar dados do usuário do Firestore
-        carregarDadosDoUsuario();
-    } else {
-        userId = null;
-        loginModal.style.display = 'block';
-    }
-});
-
-// Função para carregar dados do usuário do Firestore
-function carregarDadosDoUsuario() {
-    mostrarLoading('Carregando seus dados...');
-    
-    // Carregar configurações
-    db.collection('usuarios').doc(userId).get()
-        .then(doc => {
-            if (doc.exists && doc.data().configuracoes) {
-                configuracoes = doc.data().configuracoes;
-                carregarConfiguracoes();
-            }
+        // Função para atualizar a exibição do Dashboard
+        function atualizarDashboard() {
+            const faturaNubank = calcularFaturaNubank();
+            const faturaInter = calcularFaturaInter();
             
-            // Carregar lançamentos
-            return db.collection('usuarios').doc(userId).collection('lancamentos').get();
-        })
-        .then(snapshot => {
-            lancamentos = [];
-            snapshot.forEach(doc => {
-                lancamentos.push(doc.data());
+            document.getElementById('nubank-fatura').textContent = formatarMoeda(faturaNubank);
+            document.getElementById('inter-fatura').textContent = formatarMoeda(faturaInter);
+            atualizarResumoFinanceiro();
+            // Cálculo do limite do Nubank
+            const limiteNubank = configuracoes.salario1 - (configuracoes.investimentoDia15 + faturaNubank + configuracoes.aluguel);
+            document.getElementById('nubank-limite').textContent = formatarMoeda(limiteNubank);
+            
+            // Cálculo do limite do Inter
+            const limiteInter = configuracoes.salario2 - (configuracoes.investimentoDia30 + faturaInter + configuracoes.valeTransporte);
+            document.getElementById('inter-limite').textContent = formatarMoeda(limiteInter);
+        }
+
+        // Função para calcular o valor da fatura do Nubank
+        function calcularFaturaNubank() {
+            return lancamentos
+                .filter(lancamento => lancamento.formaPagamento === 'Cartão Nubank')
+                .reduce((total, lancamento) => total + parseFloat(lancamento.valor), 0);
+        }
+
+        // Função para calcular o valor da fatura do Inter
+        function calcularFaturaInter() {
+            const valorLancamentos = lancamentos
+                .filter(lancamento => lancamento.formaPagamento === 'Cartão Inter')
+                .reduce((total, lancamento) => total + parseFloat(lancamento.valor), 0);
+            
+            // Soma dos valores fixos do cartão Inter
+            const valoresFixos = parseFloat(configuracoes.gympass || 0) + 
+                              parseFloat(configuracoes.cabelo || 0) + 
+                              parseFloat(configuracoes.corinthians || 0) + 
+                              parseFloat(configuracoes.anuidade || 0) + 
+                              parseFloat(configuracoes.psn || 0);
+            
+            return valorLancamentos + valoresFixos;
+        }
+
+        // Função para atualizar a tabela de lançamentos
+        function atualizarTabelaLancamentos() {
+            const tbody = document.querySelector('#tabela-lancamentos tbody');
+            tbody.innerHTML = '';
+            
+            lancamentos.forEach((lancamento, index) => {
+                const tr = document.createElement('tr');
+                
+                // Formatar a data para exibição dd/mm/yyyy
+                const [ano, mes, dia] = lancamento.data.split("-");
+const dataFormatada = `${dia}/${mes}/${ano}`;                
+                // Formatar valor com cor diferente se for negativo
+                const valorFloat = parseFloat(lancamento.valor);
+                const valorFormatado = formatarMoeda(Math.abs(valorFloat));
+                const valorHtml = valorFloat < 0 ? 
+                    `<span style="color: red">-${valorFormatado}</span>` : 
+                    `<span style="color: green">${valorFormatado}</span>`;
+                
+tr.innerHTML = `
+    <td>${dataFormatada}</td>
+    <td>${lancamento.descricao}</td>
+    <td>${lancamento.formaPagamento}</td>
+    <td>${valorHtml}</td>
+    <td>
+        <button class="action-btn edit-btn" data-index="${index}">✎</button>
+        <button class="action-btn delete-btn" data-index="${index}">✖</button>
+    </td>
+`;                
+                tbody.appendChild(tr);
             });
             
-            // Atualizar interface
-            atualizarTabelaLancamentos();
-            atualizarDashboard();
-            atualizarPagamentos();
-            esconderLoading();
-        })
-        .catch(error => {
-            console.error("Erro ao carregar dados: ", error);
-            esconderLoading();
-            alert("Erro ao carregar dados. Por favor, tente novamente.");
-        });
-}
-
-// Função para salvar configurações no Firestore
-function salvarConfiguracoes() {
-    if (!userId) return;
-    
-    mostrarLoading('Salvando configurações...');
-    
-    db.collection('usuarios').doc(userId).set({
-        configuracoes: configuracoes
-    }, { merge: true })
-    .then(() => {
-        esconderLoading();
-    })
-    .catch(error => {
-        console.error("Erro ao salvar configurações: ", error);
-        esconderLoading();
-        alert("Erro ao salvar configurações. Por favor, tente novamente.");
-    });
-}
-
-// Função para salvar um lançamento no Firestore
-function salvarLancamento(lancamento) {
-    if (!userId) return;
-    
-    mostrarLoading('Salvando lançamento...');
-    
-    // Adicionar ID único ao lançamento se não tiver
-    if (!lancamento.id) {
-        lancamento.id = Date.now().toString();
-    }
-    
-    db.collection('usuarios').doc(userId).collection('lancamentos').doc(lancamento.id).set(lancamento)
-        .then(() => {
-            esconderLoading();
-        })
-        .catch(error => {
-            console.error("Erro ao salvar lançamento: ", error);
-            esconderLoading();
-            alert("Erro ao salvar lançamento. Por favor, tente novamente.");
-        });
-}
-
-// Função para excluir um lançamento no Firestore
-function excluirLancamento(id) {
-    if (!userId) return;
-    
-    mostrarLoading('Excluindo lançamento...');
-    
-    db.collection('usuarios').doc(userId).collection('lancamentos').doc(id).delete()
-        .then(() => {
-            esconderLoading();
-        })
-        .catch(error => {
-            console.error("Erro ao excluir lançamento: ", error);
-            esconderLoading();
-            alert("Erro ao excluir lançamento. Por favor, tente novamente.");
-        });
-}
-
-// Função para atualizar a exibição do Dashboard
-function atualizarDashboard() {
-    const faturaNubank = calcularFaturaNubank();
-    const faturaInter = calcularFaturaInter();
-    
-    document.getElementById('nubank-fatura').textContent = formatarMoeda(faturaNubank);
-    document.getElementById('inter-fatura').textContent = formatarMoeda(faturaInter);
-    atualizarResumoFinanceiro();
-    
-    // Cálculo do limite do Nubank
-    const limiteNubank = configuracoes.salario1 - (configuracoes.investimentoDia15 + faturaNubank + configuracoes.aluguel);
-    document.getElementById('nubank-limite').textContent = formatarMoeda(limiteNubank);
-    
-    // Cálculo do limite do Inter
-    const limiteInter = configuracoes.salario2 - (configuracoes.investimentoDia30 + faturaInter + configuracoes.valeTransporte);
-    document.getElementById('inter-limite').textContent = formatarMoeda(limiteInter);
-}
-
-// Função para calcular o valor da fatura do Nubank
-function calcularFaturaNubank() {
-    return lancamentos
-        .filter(lancamento => lancamento.formaPagamento === 'Cartão Nubank')
-        .reduce((total, lancamento) => total + parseFloat(lancamento.valor), 0);
-}
-
-// Função para calcular o valor da fatura do Inter
-function calcularFaturaInter() {
-    const valorLancamentos = lancamentos
-        .filter(lancamento => lancamento.formaPagamento === 'Cartão Inter')
-        .reduce((total, lancamento) => total + parseFloat(lancamento.valor), 0);
-    
-    // Soma dos valores fixos do cartão Inter
-    const valoresFixos = parseFloat(configuracoes.gympass || 0) + 
-                      parseFloat(configuracoes.cabelo || 0) + 
-                      parseFloat(configuracoes.corinthians || 0) + 
-                      parseFloat(configuracoes.anuidade || 0) + 
-                      parseFloat(configuracoes.psn || 0);
-    
-    return valorLancamentos + valoresFixos;
-}
-
-// Função para atualizar a tabela de lançamentos
-function atualizarTabelaLancamentos() {
-    const tbody = document.querySelector('#tabela-lancamentos tbody');
-    tbody.innerHTML = '';
-    
-    lancamentos.forEach((lancamento) => {
-        const tr = document.createElement('tr');
-        
-        // Formatar a data para exibição dd/mm/yyyy
-        const [ano, mes, dia] = lancamento.data.split("-");
-        const dataFormatada = `${dia}/${mes}/${ano}`;
-        
-        // Formatar valor com cor diferente se for negativo
-        const valorFloat = parseFloat(lancamento.valor);
-        const valorFormatado = formatarMoeda(Math.abs(valorFloat));
-        const valorHtml = valorFloat < 0 ? 
-            `<span style="color: red">-${valorFormatado}</span>` : 
-            `<span style="color: green">${valorFormatado}</span>`;
-        
-        tr.innerHTML = `
-            <td>${dataFormatada}</td>
-            <td>${lancamento.descricao}</td>
-            <td>${lancamento.formaPagamento}</td>
-            <td>${valorHtml}</td>
-            <td>
-                <button class="action-btn edit-btn" data-id="${lancamento.id}">✎</button>
-                <button class="action-btn delete-btn" data-id="${lancamento.id}">x</button>
-            </td>
-        `;
-        
-        tbody.appendChild(tr);
-    });
-    
-    // Adicionar event listeners para os botões de ação
-    document.querySelectorAll('.delete-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const id = this.getAttribute('data-id');
-            if (confirm('Tem certeza que deseja excluir este lançamento?')) {
-                const index = lancamentos.findIndex(l => l.id === id);
-                if (index !== -1) {
-                    excluirLancamento(id);
+            // Adicionar event listeners para os botões de ação
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
                     lancamentos.splice(index, 1);
+                    localStorage.setItem('lancamentos', JSON.stringify(lancamentos));
                     atualizarTabelaLancamentos();
                     atualizarDashboard();
                     atualizarPagamentos();
-                }
+atualizarResumoFinanceiro();
+atualizarResumoFinanceiro();
+                });
+            });
+            
+            document.querySelectorAll('.edit-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    abrirModalEdicao(index);
+                });
+            });
+        }
+
+        // Função para abrir o modal de edição
+        function abrirModalEdicao(index) {
+            const lancamento = lancamentos[index];
+            
+            document.getElementById('edit-tipo').value = lancamento.tipo;
+            document.getElementById('edit-descricao').value = lancamento.descricao;
+            document.getElementById('edit-valor').value = lancamento.valor;
+            document.getElementById('edit-categoria').value = lancamento.categoria;
+            document.getElementById('edit-forma-pagamento').value = lancamento.formaPagamento;
+            document.getElementById('edit-data').value = lancamento.data;
+            document.getElementById('edit-index').value = index;
+            
+            modal.style.display = 'block';
+        }
+
+        // Fechar o modal quando clicar no X
+        closeModal.addEventListener('click', function() {
+            modal.style.display = 'none';
+        });
+
+        // Fechar o modal quando clicar fora dele
+        window.addEventListener('click', function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
             }
         });
-    });
-    
-    document.querySelectorAll('.edit-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const id = this.getAttribute('data-id');
-            const index = lancamentos.findIndex(l => l.id === id);
-            if (index !== -1) {
-                abrirModalEdicao(index);
-            }
-        });
-    });
-}
 
-// Função para abrir o modal de edição
-function abrirModalEdicao(index) {
-    const lancamento = lancamentos[index];
-    
-    document.getElementById('edit-tipo').value = lancamento.tipo;
-    document.getElementById('edit-descricao').value = lancamento.descricao;
-    document.getElementById('edit-valor').value = lancamento.valor;
-    document.getElementById('edit-categoria').value = lancamento.categoria;
-    document.getElementById('edit-forma-pagamento').value = lancamento.formaPagamento;
-    document.getElementById('edit-data').value = lancamento.data;
-    document.getElementById('edit-index').value = index;
-    
-    modal.style.display = 'block';
-}
+        // Função para atualizar os pagamentos
+        function atualizarPagamentos() {
+            const faturaNubank = calcularFaturaNubank();
+            const faturaInter = calcularFaturaInter();
+            
+            // Atualizar os valores na aba de pagamentos
+            document.getElementById('fatura-nubank-valor').textContent = formatarMoeda(faturaNubank);
+            document.getElementById('aluguel-valor').textContent = formatarMoeda(parseFloat(configuracoes.aluguel) || 0);
+            document.getElementById('investimento-dia15-valor').textContent = formatarMoeda(parseFloat(configuracoes.investimentoDia15) || 0);
+            
+            const totalDia15 = faturaNubank + (parseFloat(configuracoes.aluguel) || 0) + (parseFloat(configuracoes.investimentoDia15) || 0);
+            document.getElementById('total-dia15').textContent = formatarMoeda(totalDia15);
+            
+            document.getElementById('fatura-inter-valor').textContent = formatarMoeda(faturaInter);
+            document.getElementById('vale-transporte-valor').textContent = formatarMoeda(parseFloat(configuracoes.valeTransporte) || 0);
+            document.getElementById('investimento-dia30-valor').textContent = formatarMoeda(parseFloat(configuracoes.investimentoDia30) || 0);
+            
+            const totalDia30 = faturaInter + (parseFloat(configuracoes.valeTransporte) || 0) + (parseFloat(configuracoes.investimentoDia30) || 0);
+            document.getElementById('total-dia30').textContent = formatarMoeda(totalDia30);
+        }
 
-// Fechar o modal quando clicar no X
-closeModal.addEventListener('click', function() {
-    modal.style.display = 'none';
-});
-
-// Fechar o modal quando clicar fora dele
-window.addEventListener('click', function(event) {
-    if (event.target == modal) {
-        modal.style.display = 'none';
-    }
-});
-
-// Função para atualizar os pagamentos
-function atualizarPagamentos() {
-    const faturaNubank = calcularFaturaNubank();
-    const faturaInter = calcularFaturaInter();
-    
-    // Atualizar os valores na aba de pagamentos
-    document.getElementById('fatura-nubank-valor').textContent = formatarMoeda(faturaNubank);
-    document.getElementById('aluguel-valor').textContent = formatarMoeda(parseFloat(configuracoes.aluguel) || 0);
-    document.getElementById('investimento-dia15-valor').textContent = formatarMoeda(parseFloat(configuracoes.investimentoDia15) || 0);
-    
-    const totalDia15 = faturaNubank + (parseFloat(configuracoes.aluguel) || 0) + (parseFloat(configuracoes.investimentoDia15) || 0);
-    document.getElementById('total-dia15').textContent = formatarMoeda(totalDia15);
-    
-    document.getElementById('fatura-inter-valor').textContent = formatarMoeda(faturaInter);
-    document.getElementById('vale-transporte-valor').textContent = formatarMoeda(parseFloat(configuracoes.valeTransporte) || 0);
-    document.getElementById('investimento-dia30-valor').textContent = formatarMoeda(parseFloat(configuracoes.investimentoDia30) || 0);
-    
-    const totalDia30 = faturaInter + (parseFloat(configuracoes.valeTransporte) || 0) + (parseFloat(configuracoes.investimentoDia30) || 0);
-    document.getElementById('total-dia30').textContent = formatarMoeda(totalDia30);
-}
-
-// Carregar as configurações nos campos do formulário
-function carregarConfiguracoes() {
-    document.getElementById('salario1').value = configuracoes.salario1 || '';
-    document.getElementById('salario2').value = configuracoes.salario2 || '';
-    document.getElementById('aluguel').value = configuracoes.aluguel || '';
-    document.getElementById('vale-transporte').value = configuracoes.valeTransporte || '';
-    document.getElementById('gympass').value = configuracoes.gympass || '';
-    document.getElementById('cabelo').value = configuracoes.cabelo || '';
-    document.getElementById('corinthians').value = configuracoes.corinthians || '';
-    document.getElementById('psn').value = configuracoes.psn || '';
-    document.getElementById('anuidade').value = configuracoes.anuidade || '';
-    document.getElementById('investimento-dia15').value = configuracoes.investimentoDia15 || '';
-    document.getElementById('investimento-dia30').value = configuracoes.investimentoDia30 || '';
-}
+        // Carregar as configurações nos campos do formulário
+        function carregarConfiguracoes() {
+            document.getElementById('salario1').value = configuracoes.salario1 || '';
+            document.getElementById('salario2').value = configuracoes.salario2 || '';
+            document.getElementById('aluguel').value = configuracoes.aluguel || '';
+            document.getElementById('vale-transporte').value = configuracoes.valeTransporte || '';
+            document.getElementById('gympass').value = configuracoes.gympass || '';
+            document.getElementById('cabelo').value = configuracoes.cabelo || '';
+            document.getElementById('corinthians').value = configuracoes.corinthians || '';
+            document.getElementById('psn').value = configuracoes.psn || '';
+            document.getElementById('anuidade').value = configuracoes.anuidade || '';
+            document.getElementById('investimento-dia15').value = configuracoes.investimentoDia15 || '';
+            document.getElementById('investimento-dia30').value = configuracoes.investimentoDia30 || '';
+        }
 
 // Função para pagar fatura (remover lançamentos do cartão específico)
 function pagarFatura(cartao) {
-    if (!userId) return;
-    
     if (confirm(`Tem certeza que deseja pagar a fatura do ${cartao}? Isso irá remover todos os lançamentos deste cartão.`)) {
-        mostrarLoading(`Fechando fatura do ${cartao}...`);
+        lancamentos = lancamentos.filter(lancamento => lancamento.formaPagamento !== `Cartão ${cartao}`);
+        localStorage.setItem('lancamentos', JSON.stringify(lancamentos));
         
-        // Primeiro obter todos os lançamentos do cartão
-        const lancamentosDoCartao = lancamentos.filter(l => l.formaPagamento === `Cartão ${cartao}`);
+        atualizarTabelaLancamentos();
+        atualizarDashboard();
+        atualizarPagamentos();
         
-        // Criar array de promessas para excluir cada lançamento
-        const promessas = lancamentosDoCartao.map(lancamento => 
-            db.collection('usuarios').doc(userId).collection('lancamentos').doc(lancamento.id).delete()
-        );
-        
-        // Executar todas as promessas
-        Promise.all(promessas)
-            .then(() => {
-                // Atualizar array local
-                lancamentos = lancamentos.filter(l => l.formaPagamento !== `Cartão ${cartao}`);
-                
-                atualizarTabelaLancamentos();
-                atualizarDashboard();
-                atualizarPagamentos();
-                
-                esconderLoading();
-                alert(`Fatura do ${cartao} paga com sucesso!`);
-            })
-            .catch(error => {
-                console.error("Erro ao pagar fatura: ", error);
-                esconderLoading();
-                alert("Erro ao pagar fatura. Por favor, tente novamente.");
-            });
+        alert(`Fatura do ${cartao} paga com sucesso!`);
     }
 }
 
@@ -1608,7 +1309,6 @@ document.getElementById('form-lancamento').addEventListener('submit', function(e
     e.preventDefault();
     
     const novoLancamento = {
-        id: Date.now().toString(),
         data: document.getElementById('data').value,
         tipo: document.getElementById('tipo').value,
         descricao: document.getElementById('descricao').value,
@@ -1617,11 +1317,8 @@ document.getElementById('form-lancamento').addEventListener('submit', function(e
         formaPagamento: document.getElementById('forma-pagamento').value
     };
     
-    // Salvar no Firestore
-    salvarLancamento(novoLancamento);
-    
-    // Adicionar à lista local
     lancamentos.push(novoLancamento);
+    localStorage.setItem('lancamentos', JSON.stringify(lancamentos));
     
     // Limpar o formulário
     this.reset();
@@ -1655,8 +1352,7 @@ document.getElementById('form-configuracoes').addEventListener('submit', functio
         investimentoDia30: parseFloat(document.getElementById('investimento-dia30').value) || 0
     };
     
-    // Salvar no Firestore
-    salvarConfiguracoes();
+    localStorage.setItem('configuracoes', JSON.stringify(configuracoes));
     
     alert('Configurações salvas com sucesso!');
     
@@ -1686,8 +1382,8 @@ document.getElementById('form-edicao').addEventListener('submit', function(e) {
     e.preventDefault();
     
     const index = parseInt(document.getElementById('edit-index').value);
-    const lancamentoAtualizado = {
-        id: lancamentos[index].id,
+    
+    lancamentos[index] = {
         data: document.getElementById('edit-data').value,
         tipo: document.getElementById('edit-tipo').value,
         descricao: document.getElementById('edit-descricao').value,
@@ -1696,11 +1392,7 @@ document.getElementById('form-edicao').addEventListener('submit', function(e) {
         formaPagamento: document.getElementById('edit-forma-pagamento').value
     };
     
-    // Atualizar no Firestore
-    salvarLancamento(lancamentoAtualizado);
-    
-    // Atualizar no array local
-    lancamentos[index] = lancamentoAtualizado;
+    localStorage.setItem('lancamentos', JSON.stringify(lancamentos));
     
     // Fechar o modal
     modal.style.display = 'none';
@@ -1710,7 +1402,19 @@ document.getElementById('form-edicao').addEventListener('submit', function(e) {
     atualizarDashboard();
     atualizarPagamentos();
 });
-
+// Inicializar a aplicação
+document.addEventListener('DOMContentLoaded', function() {
+    // Definir a data de hoje no campo de data
+    const hoje = new Date();
+    const dataFormatada = hoje.toISOString().split('T')[0];
+    document.getElementById('data').value = dataFormatada;
+    
+    // Carregar dados
+    carregarConfiguracoes();
+    atualizarTabelaLancamentos();
+    atualizarDashboard();
+    atualizarPagamentos();
+});
 // Variável global para o gráfico de balanço
 let balancoChart;
 
@@ -1747,7 +1451,6 @@ function atualizarResumoFinanceiro() {
     // Atualizar o gráfico
     atualizarGraficoBalanco(totalEntradas, despesasFixas, totalInvestimentos, saldo);
 }
-
 // Função para inicializar e atualizar o gráfico de balanço
 function atualizarGraficoBalanco(entradas, despesas, investimentos, saldo) {
     const ctx = document.getElementById('balanco-chart').getContext('2d');
