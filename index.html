@@ -3,371 +3,1556 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle de Portão IR</title>
+    <title>Controle Financeiro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            background-color: #f0f0f0;
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #a5b4fc;
+            --secondary-color: #10b981;
+            --secondary-dark: #059669;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --nubank-color: #8307bf;
+            --nubank-light: #9d33d9;
+            --inter-color: #ff7a00;
+            --inter-light: #ff9a3c;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --bg-light: #f9fafb;
+            --bg-white: #ffffff;
+            --bg-card: #ffffff;
+            --border-light: #e5e7eb;
+            --success-color: #22c55e;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --border-radius-sm: 0.375rem;
+            --border-radius: 0.5rem;
+            --border-radius-lg: 0.75rem;
+            --transition: all 0.3s ease;
         }
         
-        header {
-            background-color: #0066cc;
-            color: white;
-            text-align: center;
-            padding: 1rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            padding: 1.5rem;
+            font-size: 0.95rem;
+            line-height: 1.5;
         }
         
         .container {
-            flex: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0.5rem;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 1.5rem 2rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                0deg, 
+                rgba(255, 255, 255, 0.1) 0%, 
+                rgba(255, 255, 255, 0.05) 100%
+            );
+            transform: rotate(30deg);
+            z-index: 0;
+        }
+        
+        .header h1 {
+            position: relative;
+            z-index: 1;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            font-size: 1.75rem;
+        }
+        
+        .tabs {
             display: flex;
-            flex-direction: column;
+            background-color: var(--bg-white);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 0.95rem 1.25rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+            display: flex;
             align-items: center;
             justify-content: center;
-            padding: 2rem;
+            gap: 0.5rem;
+            color: var(--text-light);
+            border-bottom: 2px solid transparent;
         }
         
-        .btn-container {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            width: 100%;
-            max-width: 300px;
+        .tab:hover {
+            color: var(--primary-color);
+            background-color: rgba(99, 102, 241, 0.05);
         }
         
-        .btn {
+        .tab.active {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            background-color: rgba(99, 102, 241, 0.08);
+            font-weight: 600;
+        }
+        
+        .tab i {
+            font-size: 1rem;
+        }
+        
+        .tab-content {
+            display: none;
+            background-color: var(--bg-white);
             padding: 1.5rem;
-            font-size: 1.2rem;
-            font-weight: bold;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-light);
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .dashboard {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+        
+        .card {
+            flex: 1;
+            min-width: 280px;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            color: white;
             position: relative;
             overflow: hidden;
+            transition: var(--transition);
+            transform: translateZ(0);
         }
         
-        .btn-primary {
-            background-color: #0066cc;
-            color: white;
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
         }
         
-        .btn-secondary {
-            background-color: #ff9900;
-            color: white;
-        }
-        
-        .btn-danger {
-            background-color: #cc3300;
-            color: white;
-        }
-        
-        .btn:active {
-            transform: scale(0.97);
-        }
-        
-        .btn-primary:active {
-            background-color: #004999;
-        }
-        
-        .btn-secondary:active {
-            background-color: #cc7a00;
-        }
-        
-        .btn-danger:active {
-            background-color: #992600;
-        }
-        
-        .btn-ripple {
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .ripple {
+        .card::before {
+            content: '';
             position: absolute;
-            background: rgba(255, 255, 255, 0.4);
-            border-radius: 50%;
-            transform: scale(0);
-            animation: ripple 0.6s linear;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0));
+            z-index: 1;
         }
         
-        @keyframes ripple {
-            to {
-                transform: scale(4);
-                opacity: 0;
-            }
+        .card-content {
+            position: relative;
+            z-index: 2;
         }
         
-        .status {
-            margin-top: 2rem;
-            padding: 1rem;
-            background-color: #e8e8e8;
-            border-radius: 8px;
+        .card h3 {
+            margin-bottom: 1.25rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .card-nubank {
+            background: linear-gradient(135deg, var(--nubank-color), var(--nubank-light));
+        }
+        
+        .card-inter {
+            background: linear-gradient(135deg, var(--inter-color), var(--inter-light));
+        }
+        
+        .card-info {
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .card-info:last-of-type {
+            border-bottom: none;
+        }
+        
+        .card-info span:first-child {
+            font-weight: 500;
+            opacity: 0.9;
+        }
+        
+        .card-info span:last-child {
+            font-weight: 600;
+            font-size: 1.05rem;
+        }
+        
+        .card-footer {
+            font-size: 0.85rem;
+            margin-top: 1.25rem;
+            opacity: 0.75;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .card-footer i {
+            font-size: 0.8rem;
+        }
+        
+        h2 {
+            margin-bottom: 1.25rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 1.35rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        form {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .form-group {
+            flex: 1;
+            min-width: 220px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            font-size: 0.9rem;
+        }
+        
+        input, select {
             width: 100%;
-            max-width: 300px;
-            text-align: center;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-light);
+            border-radius: var(--border-radius-sm);
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            background-color: var(--bg-white);
+            transition: var(--transition);
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        
+        button {
+            padding: 0.75rem 1.5rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        button:hover {
+            background-color: var(--primary-dark);
+            box-shadow: var(--shadow);
+        }
+        
+        button i {
+            font-size: 1rem;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 1.25rem;
+            overflow: hidden;
+            border-radius: var(--border-radius-sm);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+        }
+        
+        th, td {
+            padding: 0.95rem 1rem;
+            text-align: left;
+        }
+        
+        th {
+            background-color: var(--bg-light);
+            font-weight: 600;
+            color: var(--text-dark);
+            border-bottom: 1px solid var(--border-light);
+            position: relative;
+        }
+        
+        th:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 25%;
+            height: 50%;
+            width: 1px;
+            background-color: var(--border-light);
+        }
+        
+        tr:not(:last-child) td {
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        tr:hover td {
+            background-color: rgba(99, 102, 241, 0.05);
+        }
+        
+.action-btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    border-radius: var(--border-radius-sm);
+    margin-right: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    width: 1.8rem;
+    height: 1.8rem;
+}        
+        .delete-btn {
+            background-color: var(--danger-color);
+        }
+        
+        .delete-btn:hover {
+            background-color: #dc2626;
+        }
+        
+        .edit-btn {
+            background-color: var(--primary-color);
+        }
+        
+        .edit-btn:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .payment-option {
+            display: inline-flex;
+            align-items: center;
+            margin-right: 1.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--border-radius-sm);
+            transition: var(--transition);
+            background-color: var(--bg-light);
+        }
+        
+        .payment-option:hover {
+            background-color: rgba(99, 102, 241, 0.1);
+        }
+        
+        .payment-option input {
+            margin-right: 0.5rem;
+            cursor: pointer;
+            width: auto;
+        }
+        
+        .payment-details {
+            margin-top: 1.5rem;
+            background-color: var(--bg-light);
+            padding: 1.25rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+        }
+        
+        .payment-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.85rem 0;
+            border-bottom: 1px solid var(--border-light);
+            align-items: center;
+        }
+        
+        .payment-item:last-child {
+            border-bottom: none;
+            font-weight: 600;
+            padding-top: 1.25rem;
+            font-size: 1.05rem;
+        }
+        
+        .payment-item span:first-child {
+            font-weight: 500;
+        }
+        
+        .payment-item span:last-child {
+            font-weight: 600;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .pay-btn {
+            background-color: var(--success-color);
+            margin-top: 1.25rem;
+        }
+        
+        .pay-btn:hover {
+            background-color: var(--secondary-dark);
         }
         
         .modal {
             display: none;
             position: fixed;
-            z-index: 1;
+            z-index: 1000;
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.6);
-            align-items: center;
-            justify-content: center;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(3px);
+            animation: fadeIn 0.3s ease;
         }
         
         .modal-content {
-            background-color: #fefefe;
-            padding: 20px;
-            border-radius: 12px;
-            width: 80%;
-            max-width: 400px;
-            text-align: center;
+            background-color: var(--bg-white);
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            width: 90%;
+            max-width: 650px;
+            animation: slideIn 0.3s ease;
         }
         
-        .pulse {
-            height: 100px;
-            width: 100px;
-            background-color: #ff9900;
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .modal-content h2 {
+            margin-bottom: 1.5rem;
+            color: var(--text-dark);
+        }
+        
+        .close {
+            color: var(--text-light);
+            float: right;
+            font-size: 1.75rem;
+            font-weight: 700;
+            line-height: 1;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             border-radius: 50%;
-            display: inline-block;
-            margin: 20px;
-            animation: pulse 1.5s ease-in-out infinite;
         }
         
-        @keyframes pulse {
-            0% {
-                transform: scale(0.95);
-                box-shadow: 0 0 0 0 rgba(255, 153, 0, 0.7);
+        .close:hover {
+            color: var(--text-dark);
+            background-color: var(--bg-light);
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .badge-despesa {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+        }
+        
+        .badge-receita {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: var(--success-color);
+        }
+        
+        .section-divider {
+            margin: 1.5rem 0;
+            height: 1px;
+            background-color: var(--border-light);
+        }
+        
+        .valor-negativo {
+            color: var(--danger-color);
+        }
+        
+        .valor-positivo {
+            color: var(--success-color);
+        }
+        
+        @media (max-width: 900px) {
+            .dashboard {
+                flex-direction: column;
             }
             
-            70% {
-                transform: scale(1);
-                box-shadow: 0 0 0 20px rgba(255, 153, 0, 0);
+            .tab {
+                padding: 0.75rem 0.5rem;
+                font-size: 0.9rem;
             }
             
-            100% {
-                transform: scale(0.95);
-                box-shadow: 0 0 0 0 rgba(255, 153, 0, 0);
+            .tab i {
+                margin-right: 0.25rem;
+            }
+            
+            .action-btn {
+                padding: 0.35rem 0.5rem;
+                font-size: 0.8rem;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
             }
         }
         
-        footer {
-            background-color: #333;
-            color: white;
-            text-align: center;
-            padding: 1rem;
-            margin-top: auto;
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            
+            .tab span {
+                display: none;
+            }
+            
+            .tab i {
+                margin-right: 0;
+                font-size: 1.1rem;
+            }
+            
+            th, td {
+                padding: 0.75rem 0.5rem;
+                font-size: 0.9rem;
+            }
+            
+            .modal-content {
+                padding: 1.5rem;
+                margin: 10% auto;
+                width: 95%;
+            }
         }
+        
+        @media (max-width: 480px) {
+            .form-group {
+                min-width: 100%;
+            }
+            
+            .action-btn {
+                padding: 0.25rem 0.4rem;
+                font-size: 0.75rem;
+            }
+            
+            th:nth-child(4), td:nth-child(4),
+            th:nth-child(5), td:nth-child(5) {
+                display: none;
+            }
+        }
+/* Estilos para o Resumo Financeiro */
+.resumo-financeiro {
+    margin-top: 1.5rem;
+    background-color: var(--bg-white);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-light);
+   max-width: 1000px; /* Define a largura máxima */
+    margin-left: auto; /* Centraliza horizontalmente */
+    margin-right: auto; /* Centraliza horizontalmente */
+}
+.resumo-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.resumo-card {
+    flex: 1;
+    min-width: 220px;
+    background-color: var(--bg-white);
+    border-radius: var(--border-radius);
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+    border: 1px solid var(--border-light);
+}
+
+.resumo-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.resumo-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    color: white;
+    font-size: 1.25rem;
+}
+
+.card-receitas .resumo-icon {
+    background-color: var(--success-color);
+}
+
+.card-despesas .resumo-icon {
+    background-color: var(--danger-color);
+}
+.card-investimentos .resumo-icon {
+    background-color: var(--warning-color);
+}
+.card-saldo .resumo-icon {
+    background-color: var(--primary-color);
+}
+
+.resumo-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.resumo-title {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-bottom: 0.25rem;
+}
+
+.resumo-value {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.chart-container {
+    margin-top: 1.5rem;
+    background-color: var(--bg-white);
+    padding: 1.25rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-light);
+}
+
+.chart-container h3 {
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    color: var(--text-dark);
+}
+
+@media (max-width: 900px) {
+    .resumo-cards {
+        flex-direction: column;
+    }
+}
     </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 </head>
 <body>
-    <header>
-        <h1>Controle de Portão IR</h1>
-    </header>
-    
     <div class="container">
-        <div class="btn-container">
-            <button id="openBtn" class="btn btn-primary btn-ripple">ABRIR/FECHAR PORTÃO</button>
-            <button id="recordBtn" class="btn btn-secondary btn-ripple">GRAVAR SINAL IR</button>
-            <button id="testBtn" class="btn btn-danger btn-ripple">TESTAR SINAL</button>
+        <div class="header">
+            <h1><i class="fas fa-wallet"></i> Controle Financeiro</h1>
         </div>
         
-        <div class="status">
-            <p>Status: <span id="statusText">Pronto</span></p>
-            <p>Sinal IR: <span id="signalStatus">Não gravado</span></p>
-            <p>Última ação: <span id="lastAction">Nenhuma</span></p>
+        <div class="tabs">
+            <div class="tab active" data-tab="dashboard"><i class="fas fa-chart-line"></i> <span>Dashboard</span></div>
+            <div class="tab" data-tab="lancamentos"><i class="fas fa-file-invoice-dollar"></i> <span>Lançamentos</span></div>
+            <div class="tab" data-tab="pagamentos"><i class="fas fa-credit-card"></i> <span>Pagamentos</span></div>
+            <div class="tab" data-tab="configuracoes"><i class="fas fa-cog"></i> <span>Configurações</span></div>
+        </div>
+        
+        <div class="tab-content active" id="dashboard">
+            <div class="dashboard">
+                <div class="card card-nubank">
+                    <div class="card-content">
+                        <h3><i class="fab fa-cc-mastercard"></i> Nubank</h3>
+                        <div class="card-info">
+                            <span>Valor da fatura:</span>
+                            <span id="nubank-fatura">R$ 0,00</span>
+                        </div>
+                        <div class="card-info">
+                            <span>Limite disponível:</span>
+                            <span id="nubank-limite">R$ 0,00</span>
+                        </div>
+                        <div class="card-footer">
+                            <i class="far fa-calendar-alt"></i> Fecha dia 12 • Vence dia 15
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card card-inter">
+                    <div class="card-content">
+                        <h3><i class=" fab fa-cc-mastercard"></i> Inter</h3>
+                        <div class="card-info">
+                            <span>Valor da fatura:</span>
+                            <span id="inter-fatura">R$ 0,00</span>
+                        </div>
+                        <div class="card-info">
+                            <span>Limite disponível:</span>
+                            <span id="inter-limite">R$ 0,00</span>
+                        </div>
+                        <div class="card-footer">
+                            <i class="far fa-calendar-alt"></i> Fecha dia 24 • Vence dia 30
+                        </div>
+                    </div>
+                </div>
+<div class="resumo-financeiro">
+    <h2><i class="fas fa-chart-pie"></i> Resumo Financeiro</h2>
+    
+    <div class="resumo-cards">
+        <div class="resumo-card card-receitas">
+            <div class="resumo-icon">
+                <i class="fas fa-money-bill-wave"></i>
+            </div>
+            <div class="resumo-content">
+                <span class="resumo-title">Entradas</span>
+                <span class="resumo-value" id="total-entradas">R$ 0,00</span>
+            </div>
+        </div>
+        
+        <div class="resumo-card card-despesas">
+            <div class="resumo-icon">
+                <i class="fas fa-file-invoice-dollar"></i>
+            </div>
+            <div class="resumo-content">
+                <span class="resumo-title">Despesas Fixas</span>
+                <span class="resumo-value" id="total-despesas">R$ 0,00</span>
+            </div>
+        </div>
+
+<div class="resumo-card card-investimentos">
+    <div class="resumo-icon">
+        <i class="fas fa-piggy-bank"></i>
+    </div>
+    <div class="resumo-content">
+        <span class="resumo-title">Investimentos</span>
+        <span class="resumo-value" id="total-investimentos">R$ 0,00</span>
+    </div>
+</div>
+        
+        <div class="resumo-card card-saldo">
+            <div class="resumo-icon">
+                <i class="fas fa-wallet"></i>
+            </div>
+            <div class="resumo-content">
+                <span class="resumo-title">Livre</span>
+                <span class="resumo-value" id="saldo-mensal">R$ 0,00</span>
+            </div>
         </div>
     </div>
     
-    <div id="recordModal" class="modal">
+    <div class="chart-container">
+        <h3>Balanço Mensal</h3>
+        <canvas id="balanco-chart"></canvas>
+    </div>
+</div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="lancamentos">
+            <h2><i class="fas fa-plus-circle"></i> Novo Lançamento</h2>
+            <form id="form-lancamento">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="tipo">Tipo</label>
+                        <select id="tipo" required>
+                            <option value="">Selecione</option>
+                            <option value="Despesa">Despesa</option>
+                            <option value="Receita">Receita</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="descricao">Descrição</label>
+                        <input type="text" id="descricao" required placeholder="Ex: Compras do mercado">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="valor">Valor</label>
+                        <input type="number" id="valor" step="0.01" required placeholder="0.00">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="categoria">Categoria</label>
+                        <select id="categoria" required>
+                            <option value="">Selecione</option>
+                            <option value="Alimentação">Alimentação</option>
+                            <option value="Transporte">Transporte</option>
+                            <option value="Saúde">Saúde</option>
+                            <option value="Lazer">Lazer</option>
+                            <option value="Educação">Educação</option>
+                            <option value="Outros">Outros</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="forma-pagamento">Forma de Pagamento</label>
+                        <select id="forma-pagamento" required>
+                            <option value="">Selecione</option>
+                            <option value="Cartão Nubank">Cartão Nubank</option>
+                            <option value="Cartão Inter">Cartão Inter</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="data">Data</label>
+                        <input type="date" id="data" required>
+                    </div>
+                </div>
+                
+                <button type="submit"><i class="fas fa-save"></i> Adicionar Lançamento</button>
+            </form>
+            
+            <div class="section-divider"></div>
+            
+            <h2><i class="fas fa-list"></i> Últimos Lançamentos</h2>
+<table id="tabela-lancamentos">
+    <thead>
+        <tr>
+            <th>Data</th>
+            <th>Descrição</th>
+            <th>Forma de Pagamento</th>
+            <th>Valor</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Os lançamentos serão adicionados aqui dinamicamente -->
+    </tbody>
+</table>
+        </div>
+        
+        <div class="tab-content" id="pagamentos">
+            <h2><i class="fas fa-money-bill-wave"></i> Pagamentos</h2>
+            <div class="payment-options">
+                <label class="payment-option">
+                    <input type="radio" name="payment-date" value="15" checked> Contas do dia 15
+                </label>
+                <label class="payment-option">
+                    <input type="radio" name="payment-date" value="30"> Contas do dia 30
+                </label>
+            </div>
+            
+            <div id="payment-dia15" class="payment-details">
+                <div class="payment-item">
+                    <span>Fatura Nubank:</span>
+                    <span id="fatura-nubank-valor">R$ 0,00</span>
+                </div>
+                <div class="payment-item">
+                    <span>Aluguel:</span>
+                    <span id="aluguel-valor">R$ 0,00</span>
+                </div>
+                <div class="payment-item">
+                    <span>Investimentos:</span>
+                    <span id="investimento-dia15-valor">R$ 0,00</span>
+                </div>
+                <div class="payment-item">
+                    <span>Total:</span>
+                    <span id="total-dia15">R$ 0,00</span>
+                </div>
+<div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.25rem;">
+    <button id="relatorio-nubank" class="pay-btn" style="background-color: #10b981;">
+        <i class="fas fa-file-alt"></i> Fechar Fatura Nubank
+    </button>
+</div>
+            </div>
+            
+            <div id="payment-dia30" class="payment-details hidden">
+                <div class="payment-item">
+                    <span>Fatura Inter:</span>
+                    <span id="fatura-inter-valor">R$ 0,00</span>
+                </div>
+                <div class="payment-item">
+                    <span>Parcela Moto:</span>
+                    <span id="parcela-moto-valor">R$ 0,00</span>
+                </div>
+                <div class="payment-item">
+                    <span>Investimentos:</span>
+                    <span id="investimento-dia30-valor">R$ 0,00</span>
+                </div>
+                <div class="payment-item">
+                    <span>Total:</span>
+                    <span id="total-dia30">R$ 0,00</span>
+                </div>
+<div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.25rem;">
+    <button id="relatorio-inter" class="pay-btn" style="background-color: #10b981;">
+        <i class="fas fa-file-alt"></i> Fechar Fatura Inter
+    </button>
+</div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="configuracoes">
+            <h2><i class="fas fa-sliders-h"></i> Configurações</h2>
+            <form id="form-configuracoes">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="salario1">Salário 1 (Dia 15)</label>
+                        <input type="number" id="salario1" min="0" step="0.01" placeholder="0.00">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="salario2">Salário 2 (Dia 30)</label>
+                        <input type="number" id="salario2" min="0" step="0.01" placeholder="0.00">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="aluguel">Aluguel</label>
+                        <input type="number" id="aluguel" min="0" step="0.01" placeholder="0.00">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="parcela-moto">Parcela Moto</label>
+                        <input type="number" id="parcela-moto" min="0" step="0.01" placeholder="0.00">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="gympass">Gympass</label>
+                        <input type="number" id="gympass" min="0" step="0.01" placeholder="0.00">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="cabelo">Cabelo</label>
+                        <input type="number" id="cabelo" min="0" step="0.01" placeholder="0.00">
+                    </div>
+                </div>
+                
+<div class="form-row">
+                    <div class="form-group">
+                        <label for="corinthians">Corinthians</label>
+                        <input type="number" id="corinthians" min="0" step="0.01">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="psn">PSN</label>
+                        <input type="number" id="psn" min="0" step="0.01">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="anuidade">Anuidade</label>
+                        <input type="number" id="anuidade" min="0" step="0.01">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="investimento-dia15">Investimento dia 15</label>
+                        <input type="number" id="investimento-dia15" min="0" step="0.01">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="investimento-dia30">Investimento dia 30</label>
+                        <input type="number" id="investimento-dia30" min="0" step="0.01">
+                    </div>
+                </div>
+                
+                <button type="submit">Salvar Configurações</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Modal de Edição -->
+    <div id="editModal" class="modal">
         <div class="modal-content">
-            <h2>Gravando Sinal IR</h2>
-            <p>Aponte seu controle para o iPhone e pressione o botão</p>
-            <div class="pulse"></div>
-            <p id="recordingStatus">Aguardando sinal...</p>
-            <button id="cancelRecordBtn" class="btn btn-danger">Cancelar</button>
+            <span class="close">&times;</span>
+            <h2>Editar Lançamento</h2>
+            <form id="form-edicao">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-tipo">Tipo</label>
+                        <select id="edit-tipo" required>
+                            <option value="">Selecione</option>
+                            <option value="Despesa">Despesa</option>
+                            <option value="Receita">Receita</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="edit-descricao">Descrição</label>
+                        <input type="text" id="edit-descricao" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="edit-valor">Valor</label>
+                        <input type="number" id="edit-valor" step="0.01" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-categoria">Categoria</label>
+                        <select id="edit-categoria" required>
+                            <option value="">Selecione</option>
+                            <option value="Alimentação">Alimentação</option>
+                            <option value="Transporte">Transporte</option>
+                            <option value="Saúde">Saúde</option>
+                            <option value="Lazer">Lazer</option>
+                            <option value="Educação">Educação</option>
+                            <option value="Outros">Outros</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="edit-forma-pagamento">Forma de Pagamento</label>
+                        <select id="edit-forma-pagamento" required>
+                            <option value="">Selecione</option>
+                            <option value="Cartão Nubank">Cartão Nubank</option>
+                            <option value="Cartão Inter">Cartão Inter</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="edit-data">Data</label>
+                        <input type="date" id="edit-data" required>
+                    </div>
+                </div>
+                
+                <input type="hidden" id="edit-index">
+                <button type="submit">Salvar Alterações</button>
+            </form>
         </div>
     </div>
-    
-    <footer>
-        <p>Controle de Portão IR v1.0</p>
-    </footer>
-    
+
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const openBtn = document.getElementById('openBtn');
-            const recordBtn = document.getElementById('recordBtn');
-            const testBtn = document.getElementById('testBtn');
-            const statusText = document.getElementById('statusText');
-            const signalStatus = document.getElementById('signalStatus');
-            const lastAction = document.getElementById('lastAction');
-            const modal = document.getElementById('recordModal');
-            const cancelRecordBtn = document.getElementById('cancelRecordBtn');
-            const recordingStatus = document.getElementById('recordingStatus');
+        // Variáveis para armazenar os dados
+        let lancamentos = JSON.parse(localStorage.getItem('lancamentos')) || [];
+        let configuracoes = JSON.parse(localStorage.getItem('configuracoes')) || {
+            salario1: 0,
+            salario2: 0,
+            aluguel: 0,
+            parcelaMoto: 0,
+            gympass: 0,
+            cabelo: 0,
+            corinthians: 0,
+            psn: 0,
+            anuidade: 0,
+            investimentoDia15: 0,
+            investimentoDia30: 0
+        };
+
+        // Referência ao modal de edição
+        const modal = document.getElementById('editModal');
+        const closeModal = document.querySelector('.close');
+
+        // Função para formatar valor em Real
+        function formatarMoeda(valor) {
+            return 'R$ ' + valor.toFixed(2).replace('.', ',');
+        }
+
+        // Função para atualizar a exibição do Dashboard
+        function atualizarDashboard() {
+            const faturaNubank = calcularFaturaNubank();
+            const faturaInter = calcularFaturaInter();
             
-            let irSignal = localStorage.getItem('irSignal') || null;
+            document.getElementById('nubank-fatura').textContent = formatarMoeda(faturaNubank);
+            document.getElementById('inter-fatura').textContent = formatarMoeda(faturaInter);
+            atualizarResumoFinanceiro();
+            // Cálculo do limite do Nubank
+            const limiteNubank = configuracoes.salario1 - (configuracoes.investimentoDia15 + faturaNubank + configuracoes.aluguel);
+            document.getElementById('nubank-limite').textContent = formatarMoeda(limiteNubank);
             
-            if (irSignal) {
-                signalStatus.textContent = "Sinal gravado";
-                openBtn.disabled = false;
-                testBtn.disabled = false;
-            } else {
-                signalStatus.textContent = "Não gravado";
-                openBtn.disabled = true;
-                testBtn.disabled = true;
-            }
+            // Cálculo do limite do Inter
+            const limiteInter = configuracoes.salario2 - (configuracoes.investimentoDia30 + faturaInter + configuracoes.parcelaMoto);
+            document.getElementById('inter-limite').textContent = formatarMoeda(limiteInter);
+        }
+
+        // Função para calcular o valor da fatura do Nubank
+        function calcularFaturaNubank() {
+            return lancamentos
+                .filter(lancamento => lancamento.formaPagamento === 'Cartão Nubank')
+                .reduce((total, lancamento) => total + parseFloat(lancamento.valor), 0);
+        }
+
+        // Função para calcular o valor da fatura do Inter
+        function calcularFaturaInter() {
+            const valorLancamentos = lancamentos
+                .filter(lancamento => lancamento.formaPagamento === 'Cartão Inter')
+                .reduce((total, lancamento) => total + parseFloat(lancamento.valor), 0);
             
-            function createRipple(event) {
-                const button = event.currentTarget;
-                const circle = document.createElement('span');
-                const diameter = Math.max(button.clientWidth, button.clientHeight);
-                const radius = diameter / 2;
-                
-                circle.style.width = circle.style.height = `${diameter}px`;
-                circle.style.left = `${event.clientX - button.offsetLeft - radius}px`;
-                circle.style.top = `${event.clientY - button.offsetTop - radius}px`;
-                circle.classList.add('ripple');
-                
-                const ripple = button.getElementsByClassName('ripple')[0];
-                
-                if (ripple) {
-                    ripple.remove();
-                }
-                
-                button.appendChild(circle);
-            }
+            // Soma dos valores fixos do cartão Inter
+            const valoresFixos = parseFloat(configuracoes.gympass || 0) + 
+                              parseFloat(configuracoes.cabelo || 0) + 
+                              parseFloat(configuracoes.corinthians || 0) + 
+                              parseFloat(configuracoes.anuidade || 0) + 
+                              parseFloat(configuracoes.psn || 0);
             
-            function updateDateTime() {
-                const now = new Date();
-                return now.toLocaleTimeString();
-            }
+            return valorLancamentos + valoresFixos;
+        }
+
+        // Função para atualizar a tabela de lançamentos
+        function atualizarTabelaLancamentos() {
+            const tbody = document.querySelector('#tabela-lancamentos tbody');
+            tbody.innerHTML = '';
             
-            openBtn.addEventListener('click', async (e) => {
-                createRipple(e);
-                statusText.textContent = "Enviando sinal IR...";
+            lancamentos.forEach((lancamento, index) => {
+                const tr = document.createElement('tr');
                 
-                if (!irSignal) {
-                    statusText.textContent = "Nenhum sinal IR gravado!";
-                    return;
-                }
+                // Formatar a data para exibição dd/mm/yyyy
+                const [ano, mes, dia] = lancamento.data.split("-");
+const dataFormatada = `${dia}/${mes}/${ano}`;                
+                // Formatar valor com cor diferente se for negativo
+                const valorFloat = parseFloat(lancamento.valor);
+                const valorFormatado = formatarMoeda(Math.abs(valorFloat));
+                const valorHtml = valorFloat < 0 ? 
+                    `<span style="color: red">-${valorFormatado}</span>` : 
+                    `<span style="color: green">${valorFormatado}</span>`;
                 
-                try {
-                    // Aqui seria chamada a API nativa para enviar o sinal IR
-                    // Como exemplo, simulamos uma requisição para um servidor local
-                    await new Promise(resolve => setTimeout(resolve, 1000));
-                    
-                    statusText.textContent = "Sinal IR enviado!";
-                    lastAction.textContent = `Portão acionado em ${updateDateTime()}`;
-                    
-                    // Na implementação real, você usaria a API específica para iOS
-                    if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.sendIRSignal) {
-                        window.webkit.messageHandlers.sendIRSignal.postMessage({
-                            signal: irSignal
-                        });
-                    }
-                } catch (error) {
-                    statusText.textContent = "Erro ao enviar sinal IR";
-                    console.error("Erro:", error);
-                }
-                
-                setTimeout(() => {
-                    statusText.textContent = "Pronto";
-                }, 3000);
+tr.innerHTML = `
+    <td>${dataFormatada}</td>
+    <td>${lancamento.descricao}</td>
+    <td>${lancamento.formaPagamento}</td>
+    <td>${valorHtml}</td>
+    <td>
+        <button class="action-btn edit-btn" data-index="${index}">✎</button>
+        <button class="action-btn delete-btn" data-index="${index}">x</button>
+    </td>
+`;                
+                tbody.appendChild(tr);
             });
             
-            recordBtn.addEventListener('click', (e) => {
-                createRipple(e);
-                modal.style.display = "flex";
-                recordingStatus.textContent = "Aguardando sinal...";
-                
-                // Aqui seria chamada a API nativa para iniciar a gravação do sinal IR
-                // Na implementação real, você usaria a API específica para iOS
-                if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.recordIRSignal) {
-                    window.webkit.messageHandlers.recordIRSignal.postMessage({});
-                }
-                
-                // Simulação de gravação para demonstração
-                setTimeout(() => {
-                    // Simulando recebimento do sinal
-                    const simulatedSignal = "IRsignal:" + Date.now().toString();
-                    recordingCompleted(simulatedSignal);
-                }, 5000);
+            // Adicionar event listeners para os botões de ação
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    lancamentos.splice(index, 1);
+                    localStorage.setItem('lancamentos', JSON.stringify(lancamentos));
+                    atualizarTabelaLancamentos();
+                    atualizarDashboard();
+                    atualizarPagamentos();
+atualizarResumoFinanceiro();
+atualizarResumoFinanceiro();
+                });
             });
             
-            // Função que seria chamada pelo iOS quando a gravação for concluída
-            window.recordingCompleted = function(signal) {
-                irSignal = signal;
-                localStorage.setItem('irSignal', irSignal);
-                signalStatus.textContent = "Sinal gravado";
-                openBtn.disabled = false;
-                testBtn.disabled = false;
-                modal.style.display = "none";
-                recordingStatus.textContent = "Sinal gravado com sucesso!";
-                lastAction.textContent = `Sinal gravado em ${updateDateTime()}`;
-            };
-            
-            testBtn.addEventListener('click', async (e) => {
-                createRipple(e);
-                if (!irSignal) {
-                    statusText.textContent = "Nenhum sinal IR gravado!";
-                    return;
-                }
-                
-                statusText.textContent = "Testando sinal IR...";
-                
-                try {
-                    // Aqui seria chamada a API nativa para enviar o sinal IR (mesmo código do botão abrir)
-                    await new Promise(resolve => setTimeout(resolve, 1000));
-                    
-                    statusText.textContent = "Teste concluído!";
-                    lastAction.textContent = `Teste realizado em ${updateDateTime()}`;
-                    
-                    if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.sendIRSignal) {
-                        window.webkit.messageHandlers.sendIRSignal.postMessage({
-                            signal: irSignal
-                        });
-                    }
-                } catch (error) {
-                    statusText.textContent = "Erro ao testar sinal";
-                    console.error("Erro:", error);
-                }
-                
-                setTimeout(() => {
-                    statusText.textContent = "Pronto";
-                }, 3000);
+            document.querySelectorAll('.edit-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    abrirModalEdicao(index);
+                });
             });
+        }
+
+        // Função para abrir o modal de edição
+        function abrirModalEdicao(index) {
+            const lancamento = lancamentos[index];
             
-            cancelRecordBtn.addEventListener('click', () => {
-                modal.style.display = "none";
-                
-                // Cancelar a gravação se estiver em andamento
-                if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.cancelRecordIRSignal) {
-                    window.webkit.messageHandlers.cancelRecordIRSignal.postMessage({});
-                }
-            });
+            document.getElementById('edit-tipo').value = lancamento.tipo;
+            document.getElementById('edit-descricao').value = lancamento.descricao;
+            document.getElementById('edit-valor').value = lancamento.valor;
+            document.getElementById('edit-categoria').value = lancamento.categoria;
+            document.getElementById('edit-forma-pagamento').value = lancamento.formaPagamento;
+            document.getElementById('edit-data').value = lancamento.data;
+            document.getElementById('edit-index').value = index;
             
-            // Função que seria chamada pelo iOS em caso de erro na gravação
-            window.recordingError = function(errorMsg) {
-                modal.style.display = "none";
-                statusText.textContent = "Erro: " + errorMsg;
-                setTimeout(() => {
-                    statusText.textContent = "Pronto";
-                }, 3000);
-            };
+            modal.style.display = 'block';
+        }
+
+        // Fechar o modal quando clicar no X
+        closeModal.addEventListener('click', function() {
+            modal.style.display = 'none';
         });
+
+        // Fechar o modal quando clicar fora dele
+        window.addEventListener('click', function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Função para atualizar os pagamentos
+        function atualizarPagamentos() {
+            const faturaNubank = calcularFaturaNubank();
+            const faturaInter = calcularFaturaInter();
+            
+            // Atualizar os valores na aba de pagamentos
+            document.getElementById('fatura-nubank-valor').textContent = formatarMoeda(faturaNubank);
+            document.getElementById('aluguel-valor').textContent = formatarMoeda(parseFloat(configuracoes.aluguel) || 0);
+            document.getElementById('investimento-dia15-valor').textContent = formatarMoeda(parseFloat(configuracoes.investimentoDia15) || 0);
+            
+            const totalDia15 = faturaNubank + (parseFloat(configuracoes.aluguel) || 0) + (parseFloat(configuracoes.investimentoDia15) || 0);
+            document.getElementById('total-dia15').textContent = formatarMoeda(totalDia15);
+            
+            document.getElementById('fatura-inter-valor').textContent = formatarMoeda(faturaInter);
+            document.getElementById('parcela-moto-valor').textContent = formatarMoeda(parseFloat(configuracoes.parcelaMoto) || 0);
+            document.getElementById('investimento-dia30-valor').textContent = formatarMoeda(parseFloat(configuracoes.investimentoDia30) || 0);
+            
+            const totalDia30 = faturaInter + (parseFloat(configuracoes.parcelaMoto) || 0) + (parseFloat(configuracoes.investimentoDia30) || 0);
+            document.getElementById('total-dia30').textContent = formatarMoeda(totalDia30);
+        }
+
+        // Carregar as configurações nos campos do formulário
+        function carregarConfiguracoes() {
+            document.getElementById('salario1').value = configuracoes.salario1 || '';
+            document.getElementById('salario2').value = configuracoes.salario2 || '';
+            document.getElementById('aluguel').value = configuracoes.aluguel || '';
+            document.getElementById('parcela-moto').value = configuracoes.parcelaMoto || '';
+            document.getElementById('gympass').value = configuracoes.gympass || '';
+            document.getElementById('cabelo').value = configuracoes.cabelo || '';
+            document.getElementById('corinthians').value = configuracoes.corinthians || '';
+            document.getElementById('psn').value = configuracoes.psn || '';
+            document.getElementById('anuidade').value = configuracoes.anuidade || '';
+            document.getElementById('investimento-dia15').value = configuracoes.investimentoDia15 || '';
+            document.getElementById('investimento-dia30').value = configuracoes.investimentoDia30 || '';
+        }
+
+// Função para pagar fatura (remover lançamentos do cartão específico)
+function pagarFatura(cartao) {
+    if (confirm(`Tem certeza que deseja pagar a fatura do ${cartao}? Isso irá remover todos os lançamentos deste cartão.`)) {
+        lancamentos = lancamentos.filter(lancamento => lancamento.formaPagamento !== `Cartão ${cartao}`);
+        localStorage.setItem('lancamentos', JSON.stringify(lancamentos));
+        
+        atualizarTabelaLancamentos();
+        atualizarDashboard();
+        atualizarPagamentos();
+        
+        alert(`Fatura do ${cartao} paga com sucesso!`);
+    }
+}
+
+// Event Listeners para alternar entre as abas
+document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        // Remover classe ativa de todas as abas
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        
+        // Adicionar classe ativa à aba clicada
+        this.classList.add('active');
+        
+        // Ativar o conteúdo da aba correspondente
+        const tabId = this.getAttribute('data-tab');
+        document.getElementById(tabId).classList.add('active');
+    });
+});
+
+// Event Listener para o formulário de novo lançamento
+document.getElementById('form-lancamento').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const novoLancamento = {
+        data: document.getElementById('data').value,
+        tipo: document.getElementById('tipo').value,
+        descricao: document.getElementById('descricao').value,
+        valor: document.getElementById('valor').value,
+        categoria: document.getElementById('categoria').value,
+        formaPagamento: document.getElementById('forma-pagamento').value
+    };
+    
+    lancamentos.push(novoLancamento);
+    localStorage.setItem('lancamentos', JSON.stringify(lancamentos));
+    
+    // Limpar o formulário
+    this.reset();
+    
+    // Definir a data de hoje no campo de data após reset
+    const hoje = new Date();
+    const dataFormatada = hoje.toISOString().split('T')[0];
+    document.getElementById('data').value = dataFormatada;
+    
+    // Atualizar a tabela e o dashboard
+    atualizarTabelaLancamentos();
+    atualizarDashboard();
+    atualizarPagamentos();
+});
+
+// Event Listener para o formulário de configurações
+document.getElementById('form-configuracoes').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    configuracoes = {
+        salario1: parseFloat(document.getElementById('salario1').value) || 0,
+        salario2: parseFloat(document.getElementById('salario2').value) || 0,
+        aluguel: parseFloat(document.getElementById('aluguel').value) || 0,
+        parcelaMoto: parseFloat(document.getElementById('parcela-moto').value) || 0,
+        gympass: parseFloat(document.getElementById('gympass').value) || 0,
+        cabelo: parseFloat(document.getElementById('cabelo').value) || 0,
+        corinthians: parseFloat(document.getElementById('corinthians').value) || 0,
+        psn: parseFloat(document.getElementById('psn').value) || 0,
+        anuidade: parseFloat(document.getElementById('anuidade').value) || 0,
+        investimentoDia15: parseFloat(document.getElementById('investimento-dia15').value) || 0,
+        investimentoDia30: parseFloat(document.getElementById('investimento-dia30').value) || 0
+    };
+    
+    localStorage.setItem('configuracoes', JSON.stringify(configuracoes));
+    
+    alert('Configurações salvas com sucesso!');
+    
+    // Atualizar o dashboard e pagamentos
+    atualizarDashboard();
+    atualizarPagamentos();
+});
+
+// Event Listeners para as opções de pagamento
+document.querySelectorAll('input[name="payment-date"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        const dia15 = document.getElementById('payment-dia15');
+        const dia30 = document.getElementById('payment-dia30');
+        
+        if (this.value === '15') {
+            dia15.classList.remove('hidden');
+            dia30.classList.add('hidden');
+        } else {
+            dia15.classList.add('hidden');
+            dia30.classList.remove('hidden');
+        }
+    });
+});
+
+// Event Listener para o formulário de edição
+document.getElementById('form-edicao').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const index = parseInt(document.getElementById('edit-index').value);
+    
+    lancamentos[index] = {
+        data: document.getElementById('edit-data').value,
+        tipo: document.getElementById('edit-tipo').value,
+        descricao: document.getElementById('edit-descricao').value,
+        valor: document.getElementById('edit-valor').value,
+        categoria: document.getElementById('edit-categoria').value,
+        formaPagamento: document.getElementById('edit-forma-pagamento').value
+    };
+    
+    localStorage.setItem('lancamentos', JSON.stringify(lancamentos));
+    
+    // Fechar o modal
+    modal.style.display = 'none';
+    
+    // Atualizar a tabela e o dashboard
+    atualizarTabelaLancamentos();
+    atualizarDashboard();
+    atualizarPagamentos();
+});
+// Inicializar a aplicação
+document.addEventListener('DOMContentLoaded', function() {
+    // Definir a data de hoje no campo de data
+    const hoje = new Date();
+    const dataFormatada = hoje.toISOString().split('T')[0];
+    document.getElementById('data').value = dataFormatada;
+    
+    // Carregar dados
+    carregarConfiguracoes();
+    atualizarTabelaLancamentos();
+    atualizarDashboard();
+    atualizarPagamentos();
+});
+// Variável global para o gráfico de balanço
+let balancoChart;
+
+// Função para calcular e exibir o resumo financeiro
+function atualizarResumoFinanceiro() {
+    // Calcular total de entradas (soma dos salários)
+    const totalEntradas = (parseFloat(configuracoes.salario1) || 0) + (parseFloat(configuracoes.salario2) || 0);
+    
+    // Calcular investimentos
+    const totalInvestimentos = (parseFloat(configuracoes.investimentoDia15) || 0) + 
+                               (parseFloat(configuracoes.investimentoDia30) || 0);
+    
+    // Calcular despesas fixas (excluindo investimentos)
+    const despesasFixas = (parseFloat(configuracoes.aluguel) || 0) + 
+                         (parseFloat(configuracoes.corinthians) || 0) + 
+                         (parseFloat(configuracoes.psn) || 0) + 
+                         (parseFloat(configuracoes.parcelaMoto) || 0) + 
+                         (parseFloat(configuracoes.gympass) || 0) + 
+                         (parseFloat(configuracoes.cabelo) || 0) + 
+                         (parseFloat(configuracoes.anuidade) || 0);
+    
+    // Calcular saldo
+    const saldo = totalEntradas - despesasFixas - totalInvestimentos;
+    
+    // Atualizar os valores no HTML
+    document.getElementById('total-entradas').textContent = formatarMoeda(totalEntradas);
+    document.getElementById('total-despesas').textContent = formatarMoeda(despesasFixas);
+    document.getElementById('total-investimentos').textContent = formatarMoeda(totalInvestimentos);
+    
+    const saldoElement = document.getElementById('saldo-mensal');
+    saldoElement.textContent = formatarMoeda(Math.abs(saldo));
+    saldoElement.className = saldo >= 0 ? 'resumo-value valor-positivo' : 'resumo-value valor-negativo';
+    
+    // Atualizar o gráfico
+    atualizarGraficoBalanco(totalEntradas, despesasFixas, totalInvestimentos, saldo);
+}
+// Função para inicializar e atualizar o gráfico de balanço
+function atualizarGraficoBalanco(entradas, despesas, investimentos, saldo) {
+    const ctx = document.getElementById('balanco-chart').getContext('2d');
+    
+    // Destruir o gráfico anterior se existir
+    if (balancoChart) {
+        balancoChart.destroy();
+    }
+    
+    // Criar o novo gráfico
+    balancoChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Entradas', 'Despesas Fixas', 'Investimentos', 'Livre'],
+            datasets: [{
+                label: 'Valor (R$)',
+                data: [entradas, despesas, investimentos, saldo >= 0 ? saldo : 0],
+                backgroundColor: [
+                    'rgba(34, 197, 94, 0.7)',    // Verde para entradas
+                    'rgba(239, 68, 68, 0.7)',    // Vermelho para despesas
+                    'rgba(245, 158, 11, 0.7)',   // Amarelo para investimentos
+                    'rgba(99, 102, 241, 0.7)'    // Azul para saldo
+                ],
+                borderColor: [
+                    'rgba(34, 197, 94, 1)',
+                    'rgba(239, 68, 68, 1)',
+                    'rgba(245, 158, 11, 1)',
+                    'rgba(99, 102, 241, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            label += formatarMoeda(context.raw);
+                            return label;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return 'R$ ' + value;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+// Função para copiar relatório no formato WhatsApp
+function gerarRelatorioPagamento(dia) {
+    let relatorio = '';
+
+    if (dia === 15) {
+        relatorio += `📊 *Pagamentos do dia 15:*\n\n`;
+        relatorio += `💳 Fatura Nubank: ${document.getElementById('fatura-nubank-valor').textContent}\n`;
+        relatorio += `🏠 Aluguel: ${document.getElementById('aluguel-valor').textContent}\n`;
+        relatorio += `📈 Investimentos: ${document.getElementById('investimento-dia15-valor').textContent}\n\n`;
+        relatorio += `💰 *Total*: ${document.getElementById('total-dia15').textContent}`;
+
+        // Apagar lançamentos do Nubank
+        lancamentos = lancamentos.filter(l => l.formaPagamento !== 'Cartão Nubank');
+    }
+
+    if (dia === 30) {
+        relatorio += `📊 *Pagamentos do dia 30:*\n\n`;
+        relatorio += `💳 Fatura Inter: ${document.getElementById('fatura-inter-valor').textContent}\n`;
+        relatorio += `🚲 Parcela Moto: ${document.getElementById('parcela-moto-valor').textContent}\n`;
+        relatorio += `📈 Investimentos: ${document.getElementById('investimento-dia30-valor').textContent}\n\n`;
+        relatorio += `💰 *Total*: ${document.getElementById('total-dia30').textContent}`;
+
+        // Apagar lançamentos do Inter
+        lancamentos = lancamentos.filter(l => l.formaPagamento !== 'Cartão Inter');
+    }
+
+    localStorage.setItem('lancamentos', JSON.stringify(lancamentos));
+    atualizarTabelaLancamentos();
+    atualizarDashboard();
+    atualizarPagamentos();
+
+    navigator.clipboard.writeText(relatorio).then(() => {
+        alert('Fatura Fechada! Agora é só colar no WhatsApp 😉');
+    });
+}
+// Event listeners para os botões de relatório
+document.getElementById('relatorio-nubank').addEventListener('click', () => gerarRelatorioPagamento(15));
+document.getElementById('relatorio-inter').addEventListener('click', () => gerarRelatorioPagamento(30));
     </script>
 </body>
 </html>
