@@ -42,9 +42,9 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         body { background-color: var(--bg-light); color: var(--text-dark); padding: 1.5rem; font-size: 0.95rem; line-height: 1.5; }
         .container { max-width: 1200px; margin: 0 auto; padding: 0.5rem; }
-        .header { background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); color: white; padding: 1.5rem 2rem; border-radius: var(--border-radius); margin-bottom: 1.5rem; text-align: center; box-shadow: var(--shadow-md); position: relative; overflow: hidden; }
+        .header { background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); color: white; padding: 1.25rem 1rem; border-radius: var(--border-radius); margin-bottom: 1.5rem; box-shadow: var(--shadow-md); position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .header::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(0deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); transform: rotate(30deg); z-index: 0; }
-        .header h1 { position: relative; z-index: 1; font-weight: 600; letter-spacing: 0.5px; font-size: 1.75rem; }
+        .header h1 { position: relative; z-index: 1; font-weight: 600; letter-spacing: 0.5px; font-size: 1.75rem; display: block; }
         .tabs { display: flex; background-color: var(--bg-white); border-radius: var(--border-radius); overflow: hidden; margin-bottom: 1.5rem; box-shadow: var(--shadow-sm); border: 1px solid var(--border-light); }
         .tab { flex: 1; padding: 0.95rem 1.25rem; text-align: center; cursor: pointer; transition: var(--transition); font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 0.5rem; color: var(--text-light); border-bottom: 2px solid transparent; }
         .tab:hover { color: var(--primary-color); background-color: rgba(99, 102, 241, 0.05); }
@@ -210,7 +210,7 @@
             max-width: 360px; width: 90%;
         }
         .login-box .login-icon { font-size: 3rem; margin-bottom: 0.5rem; }
-        .login-box h2 { font-size: 1.4rem; font-weight: 700; color: #1f2937; margin-bottom: 0.4rem; }
+        .login-box h2 { font-size: 1.4rem; font-weight: 700; color: #1f2937; margin-bottom: 0.4rem; display: block; text-align: center; }
         .login-box p  { color: #6b7280; font-size: 0.9rem; margin-bottom: 1.75rem; }
         .btn-google {
             display: flex; align-items: center; justify-content: center; gap: 0.75rem;
@@ -222,6 +222,18 @@
         .btn-google:hover { border-color: #6366f1; color: #6366f1; box-shadow: 0 2px 8px rgba(99,102,241,0.2); }
         .btn-google svg { width: 20px; height: 20px; flex-shrink: 0; }
         .login-box .login-note { margin-top: 1.25rem; font-size: 0.78rem; color: #9ca3af; }
+        #btn-logout.btn-logout-header {
+            position: absolute; right: 1rem; top: 50%; transform: translateY(-50%);
+            padding: 0.3rem 0.8rem; font-size: 0.75rem;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.4);
+            border-radius: 2rem; color: white; cursor: pointer; z-index: 2;
+            white-space: nowrap; box-shadow: none; line-height: 1.4;
+        }
+        #btn-logout.btn-logout-header:hover { background: rgba(255,255,255,0.35); box-shadow: none; }
+        @media (max-width: 480px) {
+            #btn-logout.btn-logout-header { font-size: 0.65rem; padding: 0.2rem 0.5rem; right: 0.4rem; }
+        }
     </style>
 </head>
 <body>
@@ -244,10 +256,10 @@
         <p class="login-note">🔒 Apenas você terá acesso aos seus dados</p>
     </div>
 </div>
-<div class="container">
+<div class="container" id="app-container" style="display:none">
     <div class="header">
         <h1><i class="fas fa-wallet"></i> Controle Financeiro</h1>
-        <button id="btn-logout" onclick="firebase.auth().signOut()" style="position:absolute;top:1rem;right:1rem;padding:0.35rem 0.85rem;font-size:0.78rem;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);border-radius:2rem;color:white;cursor:pointer;z-index:2;">Sair</button>
+        <button id="btn-logout" onclick="firebase.auth().signOut()" class="btn-logout-header">⬡ Sair</button>
     </div>
 
     <div class="tabs">
@@ -750,11 +762,13 @@ document.getElementById('btn-login').addEventListener('click', () => {
 auth.onAuthStateChanged(user => {
     if (user) {
         document.getElementById('login-screen').classList.remove('visible');
+        document.getElementById('app-container').style.display = '';
         document.getElementById('loading-overlay').style.display = 'flex';
         DOC_REF = db.collection('financas').doc(user.uid);
         iniciarSincronizacao();
     } else {
         if (snapshotUnsubscribe) { snapshotUnsubscribe(); snapshotUnsubscribe = null; }
+        document.getElementById('app-container').style.display = 'none';
         document.getElementById('loading-overlay').style.display = 'none';
         document.getElementById('login-screen').classList.add('visible');
         setStatus('🔒 Desconectado', 'err');
