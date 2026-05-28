@@ -174,6 +174,7 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <style>
         #loading-overlay {
             position: fixed; inset: 0; background: rgba(255,255,255,0.92);
@@ -196,6 +197,31 @@
         .status-ok   { background: #dcfce7; color: #16a34a; }
         .status-err  { background: #fee2e2; color: #dc2626; }
         .status-sync { background: #eff6ff; color: #2563eb; }
+        /* Tela de login */
+        #login-screen {
+            display: none; position: fixed; inset: 0; z-index: 9998;
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            align-items: center; justify-content: center;
+        }
+        #login-screen.visible { display: flex; }
+        .login-box {
+            background: white; border-radius: 1rem; padding: 2.5rem 2rem;
+            text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            max-width: 360px; width: 90%;
+        }
+        .login-box .login-icon { font-size: 3rem; margin-bottom: 0.5rem; }
+        .login-box h2 { font-size: 1.4rem; font-weight: 700; color: #1f2937; margin-bottom: 0.4rem; }
+        .login-box p  { color: #6b7280; font-size: 0.9rem; margin-bottom: 1.75rem; }
+        .btn-google {
+            display: flex; align-items: center; justify-content: center; gap: 0.75rem;
+            width: 100%; padding: 0.85rem 1.5rem; border: 2px solid #e5e7eb;
+            border-radius: 0.5rem; background: white; cursor: pointer;
+            font-size: 0.95rem; font-weight: 600; color: #374151;
+            transition: all 0.2s; box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+        .btn-google:hover { border-color: #6366f1; color: #6366f1; box-shadow: 0 2px 8px rgba(99,102,241,0.2); }
+        .btn-google svg { width: 20px; height: 20px; flex-shrink: 0; }
+        .login-box .login-note { margin-top: 1.25rem; font-size: 0.78rem; color: #9ca3af; }
     </style>
 </head>
 <body>
@@ -204,9 +230,24 @@
     <p>Conectando ao Firebase...</p>
 </div>
 <div id="firebase-status" class="status-sync">⏳ Conectando...</div>
+
+<!-- Tela de login -->
+<div id="login-screen">
+    <div class="login-box">
+        <div class="login-icon">💰</div>
+        <h2>Controle Financeiro</h2>
+        <p>Entre com sua conta Google para acessar seus dados</p>
+        <button class="btn-google" id="btn-login">
+            <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.8 2.5 30.3 0 24 0 14.6 0 6.6 5.4 2.5 13.3l7.8 6C12.2 13.1 17.6 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 6.9-10.1 6.9-17z"/><path fill="#FBBC05" d="M10.3 28.7A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7l-7.8-6A24 24 0 0 0 0 24c0 3.8.9 7.5 2.5 10.7l7.8-6z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.8 2.3-8.4 2.3-6.4 0-11.8-3.6-13.7-9.3l-7.8 6C6.6 42.6 14.6 48 24 48z"/></svg>
+            Entrar com Google
+        </button>
+        <p class="login-note">🔒 Apenas você terá acesso aos seus dados</p>
+    </div>
+</div>
 <div class="container">
     <div class="header">
         <h1><i class="fas fa-wallet"></i> Controle Financeiro</h1>
+        <button id="btn-logout" onclick="firebase.auth().signOut()" style="position:absolute;top:1rem;right:1rem;padding:0.35rem 0.85rem;font-size:0.78rem;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);border-radius:2rem;color:white;cursor:pointer;z-index:2;">Sair</button>
     </div>
 
     <div class="tabs">
@@ -618,18 +659,21 @@
 //  ⚙️  CONFIGURAÇÃO DO FIREBASE — cole seus dados aqui
 // ═══════════════════════════════════════════════════════
 const firebaseConfig = {
-    apiKey:            "AIzaSyDQEBkocKVbGm5tIMgpcSKKRCfwGaWbT8U",
-    authDomain:        "financas-pessoais-bbd4c.firebaseapp.com",
-    projectId:         "financas-pessoais-bbd4c",
-    storageBucket:     "financas-pessoais-bbd4c.firebasestorage.app",
-    messagingSenderId: "225046583699",
-    appId:             "1:225046583699:web:ed6f65f01edf6bce95b066"
+    apiKey:            "COLE_SEU_API_KEY_AQUI",
+    authDomain:        "SEU_PROJETO.firebaseapp.com",
+    projectId:         "SEU_PROJETO_ID",
+    storageBucket:     "SEU_PROJETO.appspot.com",
+    messagingSenderId: "SEU_MESSAGING_SENDER_ID",
+    appId:             "SEU_APP_ID"
 };
 // ═══════════════════════════════════════════════════════
 
 firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const DOC_REF = db.collection('financas').doc('dados');
+const db   = firebase.firestore();
+const auth = firebase.auth();
+
+let DOC_REF = null;
+let snapshotUnsubscribe = null;
 
 // Variáveis globais (serão preenchidas pelo Firebase)
 let lancamentos = [];
@@ -685,6 +729,7 @@ function setStatus(msg, tipo) {
 }
 
 async function salvarFirebase(chave, dados) {
+    if (!DOC_REF) return;
     try {
         setStatus('💾 Salvando...', 'sync');
         await DOC_REF.set({ [chave]: dados }, { merge: true });
@@ -696,8 +741,29 @@ async function salvarFirebase(chave, dados) {
     }
 }
 
-// Escuta atualizações em tempo real (sincroniza entre dispositivos)
-DOC_REF.onSnapshot(doc => {
+// ─── Login com Google ──────────────────────────────────
+document.getElementById('btn-login').addEventListener('click', () => {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider).catch(e => alert('Erro ao entrar: ' + e.message));
+});
+
+auth.onAuthStateChanged(user => {
+    if (user) {
+        document.getElementById('login-screen').classList.remove('visible');
+        document.getElementById('loading-overlay').style.display = 'flex';
+        DOC_REF = db.collection('financas').doc(user.uid);
+        iniciarSincronizacao();
+    } else {
+        if (snapshotUnsubscribe) { snapshotUnsubscribe(); snapshotUnsubscribe = null; }
+        document.getElementById('loading-overlay').style.display = 'none';
+        document.getElementById('login-screen').classList.add('visible');
+        setStatus('🔒 Desconectado', 'err');
+    }
+});
+
+function iniciarSincronizacao() {
+    if (snapshotUnsubscribe) snapshotUnsubscribe();
+    snapshotUnsubscribe = DOC_REF.onSnapshot(doc => {
     const dados = doc.data();
     if (!dados) {
         // Primeira vez: salvar dados padrão
@@ -720,11 +786,12 @@ DOC_REF.onSnapshot(doc => {
     atualizarDashboard();
     atualizarPagamentos();
     atualizarTabelaApartamento();
-}, err => {
-    document.getElementById('loading-overlay').style.display = 'none';
-    setStatus('❌ Sem conexão', 'err');
-    console.error('Erro de conexão:', err);
-});
+    }, err => {
+        document.getElementById('loading-overlay').style.display = 'none';
+        setStatus('❌ Sem conexão', 'err');
+        console.error('Erro de conexão:', err);
+    });
+}
 // ──────────────────────────────────────────────────────
 
 const modal = document.getElementById('editModal');
