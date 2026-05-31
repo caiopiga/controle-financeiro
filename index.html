@@ -166,6 +166,34 @@
         .btn-cancelar:hover { background-color: #4b5563; }
         .valor-variavel-input { display: inline-block; width: 110px; padding: 0.2rem 0.4rem; border: 1px solid var(--primary-light); border-radius: 4px; font-size: 0.9rem; font-weight: 700; color: var(--danger-color); }
 
+
+        /* ===== OVERLAY DOS FORMS DE CONFIGURAÇÃO ===== */
+        .cfg-modal-overlay {
+            display: none;
+            position: fixed; inset: 0; z-index: 999;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(3px);
+            animation: fadeIn 0.25s ease;
+            align-items: center; justify-content: center;
+        }
+        .cfg-modal-overlay.open { display: flex; }
+        .cfg-modal-box {
+            background: var(--bg-white); border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg); padding: 2rem; width: 90%;
+            max-width: 650px; max-height: 90vh; overflow-y: auto;
+            animation: slideIn 0.25s ease;
+            position: relative;
+        }
+        .cfg-modal-box h3.cfg-modal-title {
+            font-size: 1.1rem; margin-bottom: 1.25rem; color: var(--text-dark);
+        }
+        .cfg-modal-close {
+            position: absolute; top: 1rem; right: 1rem;
+            color: var(--text-light); font-size: 1.5rem; font-weight: 700;
+            cursor: pointer; line-height: 1; background: none; border: none;
+            padding: 0.2rem 0.5rem; border-radius: 50%;
+        }
+        .cfg-modal-close:hover { background: var(--bg-light); color: var(--text-dark); }
+
         @media (max-width: 900px) { body { padding: 0.75rem; } .container { padding: 0; } .dashboard { flex-direction: column; } .card { min-width: 100%; } .tab { padding: 0.75rem 0.5rem; font-size: 0.85rem; } .resumo-cards { flex-direction: column; } .resumo-card { min-width: 100%; } }
         @media (max-width: 768px) { body { padding: 0.5rem; font-size: 0.9rem; } .header { padding: 1rem 1.5rem; } .header h1 { font-size: 1.35rem; } .tab-content { padding: 1rem; } .tab span { display: none; } .tab i { margin-right: 0; font-size: 1.2rem; } .form-row { flex-direction: column; } .form-group { min-width: 100%; } table { font-size: 0.85rem; } th, td { padding: 0.6rem 0.4rem; font-size: 0.85rem; } .modal-content { padding: 1.25rem; margin: 5% auto; width: 95%; } .card { padding: 1.25rem; } .card h3 { font-size: 1.25rem; } }
         @media (max-width: 480px) { body { padding: 0.25rem; } .header { padding: 0.75rem 1rem; margin-bottom: 1rem; } .header h1 { font-size: 1.15rem; } .tab-content { padding: 0.75rem; } .form-group { min-width: 100%; } input, select { padding: 0.65rem 0.85rem; font-size: 0.9rem; } button { padding: 0.65rem 1.25rem; font-size: 0.9rem; } .action-btn { padding: 0.3rem 0.45rem; font-size: 0.8rem; width: 2rem; height: 2rem; } table { display: block; overflow-x: auto; white-space: nowrap; font-size: 0.8rem; } th, td { padding: 0.5rem 0.35rem; font-size: 0.8rem; } .card { padding: 1rem; } .card h3 { font-size: 1.1rem; margin-bottom: 1rem; } .card-info { flex-direction: column; align-items: flex-start; gap: 0.25rem; } .resumo-icon { width: 40px; height: 40px; font-size: 1.1rem; } .resumo-value { font-size: 1.1rem; } .payment-option { font-size: 0.85rem; padding: 0.4rem 0.6rem; } }
@@ -273,56 +301,7 @@
     <!-- ===== DASHBOARD ===== -->
     <div class="tab-content active" id="dashboard">
         <div class="dashboard">
-            <div class="card card-nubank">
-                <div class="card-content">
-                    <h3><i class="fab fa-cc-mastercard"></i> Nubank</h3>
-                    <div class="card-info">
-                        <span>Fatura atual:</span>
-                        <span id="nubank-fatura-total">R$ 0,00</span>
-                    </div>
-                    <div class="card-info">
-                        <span>Limite disponível:</span>
-                        <span id="nubank-limite">R$ 0,00</span>
-                    </div>
-                    <div class="card-footer">
-                        <i class="far fa-calendar-alt"></i> Fecha dia 12 • Vence dia 15
-                    </div>
-                </div>
-            </div>
-
-            <div class="card card-inter">
-                <div class="card-content">
-                    <h3><i class="fab fa-cc-mastercard"></i> Inter</h3>
-                    <div class="card-info">
-                        <span>Fatura atual:</span>
-                        <span id="inter-fatura-total">R$ 0,00</span>
-                    </div>
-                    <div class="card-info">
-                        <span>Limite disponível:</span>
-                        <span id="inter-limite">R$ 0,00</span>
-                    </div>
-                    <div class="card-footer">
-                        <i class="far fa-calendar-alt"></i> Fecha dia 24 • Vence dia 30
-                    </div>
-                </div>
-            </div>
-
-            <div class="card card-sofisa">
-                <div class="card-content">
-                    <h3><i class="fab fa-cc-visa"></i> Sofisa</h3>
-                    <div class="card-info">
-                        <span>Fatura atual:</span>
-                        <span id="sofisa-fatura-total">R$ 0,00</span>
-                    </div>
-                    <div class="card-info">
-                        <span>Limite disponível:</span>
-                        <span id="sofisa-limite">R$ 0,00</span>
-                    </div>
-                    <div class="card-footer">
-                        <i class="far fa-calendar-alt"></i> Fecha dia 26 • Vence dia 01
-                    </div>
-                </div>
-            </div>
+            <div id="dashboard-cards" style="display:flex;flex-wrap:wrap;gap:1.5rem;width:100%;"></div>
 
             <div class="resumo-financeiro">
                 <h2><i class="fas fa-chart-pie"></i> Resumo Financeiro</h2>
@@ -407,9 +386,6 @@
                     <label for="forma-pagamento">Forma de Pagamento</label>
                     <select id="forma-pagamento" required>
                         <option value="">Selecione</option>
-                        <option value="Cartão Nubank">Cartão Nubank</option>
-                        <option value="Cartão Inter">Cartão Inter</option>
-                        <option value="Cartão Sofisa">Cartão Sofisa</option>
                         <option value="PIX">PIX</option>
                         <option value="Boleto">Boleto</option>
                         <option value="Débito Automático">Débito Automático</option>
@@ -500,36 +476,51 @@
     <!-- ===== CONFIGURAÇÕES ===== -->
     <div class="tab-content" id="configuracoes">
         <h2><i class="fas fa-sliders-h"></i> Configurações</h2>
-        <form id="form-configuracoes">
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="salario1">Salário 1 (Dia 15)</label>
-                    <input type="number" id="salario1" min="0" step="0.01" placeholder="0.00">
+
+        <!-- SALÁRIOS -->
+        <div class="contas-fixas-section">
+            <h3><i class="fas fa-money-bill-wave"></i> Salários</h3>
+            <p style="font-size:0.85rem;color:var(--text-light);margin-bottom:1rem;">Adicione cada salário com a data de recebimento. O sistema usará os mais recentes para cada ciclo (dia 15 e dia 30).</p>
+            <div id="lista-salarios"></div>
+            <button class="btn-add-conta" id="btn-show-form-salario" type="button"><i class="fas fa-plus"></i> Adicionar Salário</button>
+            <div class="form-add-conta" id="form-add-salario-wrapper" style="display:none;">
+                <h3 style="font-size:0.95rem;margin-bottom:1rem;color:var(--text-dark);" id="form-salario-titulo"><i class="fas fa-plus-circle"></i> Novo Salário</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Data de Recebimento</label>
+                        <input type="date" id="sal-data">
+                    </div>
+                    <div class="form-group">
+                        <label>Valor (R$)</label>
+                        <input type="number" id="sal-valor" step="0.01" min="0" placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label>Ciclo</label>
+                        <select id="sal-ciclo">
+                            <option value="dia15">Dia 15</option>
+                            <option value="dia30">Dia 30</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="salario2">Salário 2 (Dia 30)</label>
-                    <input type="number" id="salario2" min="0" step="0.01" placeholder="0.00">
+                <input type="hidden" id="sal-edit-index" value="-1">
+                <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+                    <button type="button" id="btn-salvar-salario"><i class="fas fa-save"></i> Salvar Salário</button>
+                    <button type="button" class="btn-cancelar" id="btn-cancelar-salario"><i class="fas fa-times"></i> Cancelar</button>
                 </div>
             </div>
-            <div class="section-divider"></div>
-            <h3 style="font-size:1rem;color:var(--text-light);margin-bottom:0.75rem;font-weight:500;"><i class="fas fa-credit-card"></i> Saldo Livre por Cartão</h3>
-            <p style="font-size:0.85rem;color:var(--text-light);margin-bottom:1rem;">Define quanto do salário de cada ciclo você quer manter livre. O limite disponível será calculado automaticamente descontando as despesas fixas do ciclo.</p>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="saldo-livre-nubank">Saldo Livre — Nubank (Dia 15)</label>
-                    <input type="number" id="saldo-livre-nubank" min="0" step="0.01" placeholder="0.00">
-                </div>
-                <div class="form-group">
-                    <label for="saldo-livre-inter">Saldo Livre — Inter (Dia 30)</label>
-                    <input type="number" id="saldo-livre-inter" min="0" step="0.01" placeholder="0.00">
-                </div>
-                <div class="form-group">
-                    <label for="saldo-livre-sofisa">Saldo Livre — Sofisa (Dia 30)</label>
-                    <input type="number" id="saldo-livre-sofisa" min="0" step="0.01" placeholder="0.00">
-                </div>
-            </div>
-            <button type="submit"><i class="fas fa-save"></i> Salvar Configurações</button>
-        </form>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- CARTÕES -->
+        <div class="contas-fixas-section">
+            <h3><i class="fas fa-credit-card"></i> Cartões de Crédito</h3>
+            <p style="font-size:0.85rem;color:var(--text-light);margin-bottom:1rem;">Cadastre seus cartões com limite, vencimento e fechamento. O saldo livre será o limite menos a fatura atual.</p>
+            <div id="lista-cartoes"></div>
+            <button class="btn-add-conta" id="btn-show-form-cartao" type="button"><i class="fas fa-plus"></i> Adicionar Cartão</button>
+        </div>
+
+        <div class="section-divider"></div>
 
         <div class="section-divider"></div>
 
@@ -581,9 +572,6 @@
                     <div class="form-group">
                         <label>Forma de Pagamento</label>
                         <select id="cf-pagamento">
-                            <option value="Cartão Nubank">Cartão Nubank</option>
-                            <option value="Cartão Inter">Cartão Inter</option>
-                            <option value="Cartão Sofisa">Cartão Sofisa</option>
                             <option value="PIX">PIX</option>
                             <option value="Boleto">Boleto</option>
                             <option value="Débito Automático">Débito Automático</option>
@@ -595,6 +583,12 @@
                             <option value="dia15">Dia 15 (Nubank)</option>
                             <option value="dia30">Dia 30 (Inter / Sofisa)</option>
                         </select>
+                    </div>
+                </div>
+                <div class="form-row" id="cf-codbarras-group" style="display:none;">
+                    <div class="form-group">
+                        <label><i class="fas fa-barcode"></i> Código de Barras do Boleto</label>
+                        <input type="text" id="cf-codbarras" placeholder="Cole o código de barras aqui (será exibido no relatório)">
                     </div>
                 </div>
                 <div class="form-row">
@@ -617,6 +611,211 @@
     </div>
 </div>
 
+
+<!-- ===== MODAL SALÁRIO ===== -->
+<div id="modalSalario" class="modal" style="display:none;">
+    <div class="modal-content" style="max-width:450px;">
+        <span class="close" onclick="document.getElementById('modalSalario').style.display='none'">&times;</span>
+        <h2 id="form-salario-titulo-modal"><i class="fas fa-plus-circle"></i> Novo Salário</h2>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Data de Recebimento</label>
+                <input type="date" id="sal-data-m">
+            </div>
+            <div class="form-group">
+                <label>Valor (R$)</label>
+                <input type="number" id="sal-valor-m" step="0.01" min="0" placeholder="0.00">
+            </div>
+            <div class="form-group">
+                <label>Ciclo</label>
+                <select id="sal-ciclo-m">
+                    <option value="dia15">Dia 15</option>
+                    <option value="dia30">Dia 30</option>
+                </select>
+            </div>
+        </div>
+        <input type="hidden" id="sal-edit-index-m" value="-1">
+        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1rem;">
+            <button type="button" id="btn-salvar-salario-m"><i class="fas fa-save"></i> Salvar Salário</button>
+            <button type="button" class="btn-cancelar" onclick="document.getElementById('modalSalario').style.display='none'"><i class="fas fa-times"></i> Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== MODAL CONTA FIXA ===== -->
+<div id="modalContaFixa" class="modal" style="display:none;">
+    <div class="modal-content" style="max-width:700px;max-height:90vh;overflow-y:auto;">
+        <span class="close" onclick="document.getElementById('modalContaFixa').style.display='none'">&times;</span>
+        <h2 id="form-conta-titulo-modal"><i class="fas fa-plus-circle"></i> Nova Conta</h2>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Nome da Conta</label>
+                <input type="text" id="cf-nome-m" placeholder="Ex: Aluguel, Gympass...">
+            </div>
+            <div class="form-group">
+                <label>Valor (R$)</label>
+                <input type="number" id="cf-valor-m" step="0.01" min="0" placeholder="0.00">
+            </div>
+            <div class="form-group">
+                <label>Valor Variável?</label>
+                <select id="cf-variavel-m">
+                    <option value="nao">Não (fixo)</option>
+                    <option value="sim">Sim (editável todo mês)</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Prazo / Vencimento</label>
+                <select id="cf-prazo-m" onchange="atualizarVisibilidadePrazoModal()">
+                    <option value="dia15">Todo dia 15</option>
+                    <option value="dia30">Todo dia 30</option>
+                    <option value="perder">A perder de vista</option>
+                    <option value="parcelas">Parcelado</option>
+                    <option value="personalizado">Data específica</option>
+                </select>
+            </div>
+            <div class="form-group" id="cf-parcelas-group-m" style="display:none;">
+                <label>Nº de Parcelas restantes</label>
+                <input type="number" id="cf-parcelas-m" min="1" placeholder="Ex: 12">
+            </div>
+            <div class="form-group" id="cf-data-group-m" style="display:none;">
+                <label>Data de Vencimento</label>
+                <input type="date" id="cf-data-venc-m">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Forma de Pagamento</label>
+                <select id="cf-pagamento-m">
+                    <option value="PIX">PIX</option>
+                    <option value="Boleto">Boleto</option>
+                    <option value="Débito Automático">Débito Automático</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Ciclo (afeta qual fatura)</label>
+                <select id="cf-ciclo-m">
+                    <option value="dia15">Dia 15</option>
+                    <option value="dia30">Dia 30</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-row" id="cf-codbarras-group-m" style="display:none;">
+            <div class="form-group">
+                <label><i class="fas fa-barcode"></i> Código de Barras do Boleto</label>
+                <input type="text" id="cf-codbarras-m" placeholder="Cole o código de barras aqui">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group" style="display:flex;align-items:center;gap:0.75rem;padding-top:0.5rem;">
+                <input type="checkbox" id="cf-destaque-m" style="width:auto;cursor:pointer;">
+                <label for="cf-destaque-m" style="margin:0;cursor:pointer;font-size:0.9rem;"><i class="fas fa-star" style="color:var(--warning-color);"></i> Destacar no relatório de pagamentos</label>
+            </div>
+        </div>
+        <input type="hidden" id="cf-edit-index-m" value="-1">
+        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1rem;">
+            <button type="button" id="btn-salvar-conta-m"><i class="fas fa-save"></i> Salvar Conta</button>
+            <button type="button" class="btn-cancelar" onclick="document.getElementById('modalContaFixa').style.display='none'"><i class="fas fa-times"></i> Cancelar</button>
+        </div>
+    </div>
+</div>
+
+
+<!-- ===== MODAL CARTÃO ===== -->
+<div id="modalCartao" class="modal" style="display:none;">
+  <div class="modal-content" style="max-width:520px;max-height:92vh;overflow-y:auto;">
+    <span class="close" id="closeModalCartao">&times;</span>
+    <h2 id="form-cartao-titulo" style="margin-bottom:1.25rem;"><i class="fas fa-credit-card"></i> Novo Cartão</h2>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Nome do Cartão</label>
+        <input type="text" id="cart-nome" placeholder="Ex: Nubank, Inter, Sofisa">
+      </div>
+      <div class="form-group">
+        <label>Limite Total (R$)</label>
+        <input type="number" id="cart-limite" step="0.01" min="0" placeholder="0.00">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Vence dia</label>
+        <input type="number" id="cart-vencimento" min="1" max="31" placeholder="15">
+      </div>
+      <div class="form-group">
+        <label>Fecha dia</label>
+        <input type="number" id="cart-fechamento" min="1" max="31" placeholder="12">
+      </div>
+      <div class="form-group">
+        <label>Ciclo</label>
+        <select id="cart-ciclo">
+          <option value="dia15">Dia 15</option>
+          <option value="dia30">Dia 30</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Bandeira</label>
+        <select id="cart-bandeira">
+          <option value="mastercard">Mastercard</option>
+          <option value="visa">Visa</option>
+          <option value="elo">Elo</option>
+          <option value="amex">Amex</option>
+          <option value="hipercard">Hipercard</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- COLOR PICKER -->
+    <div class="form-group" style="margin-top:0.75rem;">
+      <label>Cor do Cartão no Dashboard</label>
+
+      <!-- Quadrado SV (Saturation / Value) -->
+      <div style="position:relative;margin-top:0.6rem;">
+        <canvas id="cp-sv" width="460" height="200"
+          style="width:100%;height:160px;border-radius:8px;cursor:crosshair;display:block;touch-action:none;"></canvas>
+        <!-- Cursor bolinha SV -->
+        <div id="cp-sv-cursor" style="
+          position:absolute;width:18px;height:18px;border-radius:50%;
+          border:3px solid #fff;box-shadow:0 0 0 2px rgba(0,0,0,.4),0 2px 6px rgba(0,0,0,.4);
+          pointer-events:none;transform:translate(-50%,-50%);top:50%;left:50%;
+          transition:background .1s;"></div>
+      </div>
+
+      <!-- Barra Hue -->
+      <div style="position:relative;margin-top:10px;">
+        <canvas id="cp-hue" width="460" height="24"
+          style="width:100%;height:20px;border-radius:20px;cursor:pointer;display:block;touch-action:none;"></canvas>
+        <!-- Cursor bolinha Hue -->
+        <div id="cp-hue-cursor" style="
+          position:absolute;width:24px;height:24px;border-radius:50%;top:50%;
+          border:3px solid #fff;box-shadow:0 0 0 2px rgba(0,0,0,.4),0 2px 6px rgba(0,0,0,.4);
+          pointer-events:none;transform:translate(-50%,-50%);left:0%;
+          transition:background .1s;"></div>
+      </div>
+
+      <!-- Preview do cartão -->
+      <div id="cp-preview" style="
+        margin-top:12px;height:52px;border-radius:10px;
+        background:linear-gradient(135deg,#8307bf,#6610f2);
+        box-shadow:0 4px 14px rgba(0,0,0,.25);transition:background .15s;
+        display:flex;align-items:center;padding:0 1rem;gap:0.6rem;color:#fff;font-weight:600;font-size:0.9rem;">
+        <i class="fab fa-cc-mastercard" id="cp-preview-icon" style="font-size:1.5rem;"></i>
+        <span id="cp-preview-nome">Meu Cartão</span>
+      </div>
+
+      <!-- Cor salva como string "hex1|hex2" -->
+      <input type="hidden" id="cart-cor-value" value="#8307bf|#6610f2">
+    </div>
+
+    <input type="hidden" id="cart-edit-index" value="-1">
+    <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1.25rem;">
+      <button type="button" id="btn-salvar-cartao"><i class="fas fa-save"></i> Salvar Cartão</button>
+      <button type="button" class="btn-cancelar" id="btn-cancelar-cartao"><i class="fas fa-times"></i> Cancelar</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal edição lançamento -->
 <div id="editModal" class="modal">
     <div class="modal-content">
@@ -633,7 +832,7 @@
                 <div class="form-group"><label for="edit-categoria">Categoria</label>
                     <select id="edit-categoria" required><option value="">Selecione</option><option value="Alimentação">Alimentação</option><option value="Transporte">Transporte</option><option value="Saúde">Saúde</option><option value="Lazer">Lazer</option><option value="Educação">Educação</option><option value="Outros">Outros</option></select></div>
                 <div class="form-group"><label for="edit-forma-pagamento">Forma de Pagamento</label>
-                    <select id="edit-forma-pagamento" required><option value="">Selecione</option><option value="Cartão Nubank">Cartão Nubank</option><option value="Cartão Inter">Cartão Inter</option><option value="Cartão Sofisa">Cartão Sofisa</option><option value="PIX">PIX</option><option value="Boleto">Boleto</option><option value="Débito Automático">Débito Automático</option></select></div>
+                    <select id="edit-forma-pagamento" required><option value="">Selecione</option><option value="PIX">PIX</option><option value="Boleto">Boleto</option><option value="Débito Automático">Débito Automático</option></select></div>
                 <div class="form-group"><label for="edit-data">Data</label><input type="date" id="edit-data" required></div>
             </div>
             <input type="hidden" id="edit-index">
@@ -691,6 +890,8 @@ let snapshotUnsubscribe = null;
 let lancamentos = [];
 let configuracoes = { salario1: 0, salario2: 0, saldoLivreNubank: 0, saldoLivreInter: 0, saldoLivreSofisa: 0 };
 let contasFixas = [];
+let salarios = []; // [{data, valor, ciclo}]
+let cartoes = [];  // [{nome, limite, vencimento, fechamento, ciclo}]
 // Dados padrão do apartamento (usados apenas na 1ª vez que o Firebase estiver vazio)
 const parcelasApartamentoPadrao = [
     { mes: "Ato", data: "2025-08-17", parcelaEntrada: 800.00, construcao: 0.000, evolucaoObra: 0.00, parcelaTotal: 800.00, situacao: "PAGO" },
@@ -790,7 +991,22 @@ function iniciarSincronizacao() {
     lancamentos          = dados.lancamentos          || [];
     configuracoes        = dados.configuracoes        || { salario1: 0, salario2: 0, saldoLivreNubank: 0, saldoLivreInter: 0, saldoLivreSofisa: 0 };
     contasFixas          = dados.contasFixas          || [];
+    salarios             = dados.salarios             || [];
+    cartoes              = dados.cartoes              || [];
     parcelasApartamento  = dados.parcelasApartamento  || [...parcelasApartamentoPadrao];
+
+    // Backward compatibility: se não tem salarios mas tem configuracoes antigas, migrar
+    if (salarios.length === 0 && (configuracoes.salario1 > 0 || configuracoes.salario2 > 0)) {
+        const hoje = new Date().toISOString().split('T')[0];
+        if (configuracoes.salario1 > 0) salarios.push({ data: hoje, valor: configuracoes.salario1, ciclo: 'dia15' });
+        if (configuracoes.salario2 > 0) salarios.push({ data: hoje, valor: configuracoes.salario2, ciclo: 'dia30' });
+    }
+    // Backward compatibility: cartões fixos antigos → migrar para cartoes[]
+    if (cartoes.length === 0) {
+        if (configuracoes.saldoLivreNubank > 0) cartoes.push({ nome: 'Nubank', limite: configuracoes.saldoLivreNubank, vencimento: 15, fechamento: 12, ciclo: 'dia15' });
+        if (configuracoes.saldoLivreInter  > 0) cartoes.push({ nome: 'Inter',  limite: configuracoes.saldoLivreInter,  vencimento: 30, fechamento: 24, ciclo: 'dia30' });
+        if (configuracoes.saldoLivreSofisa > 0) cartoes.push({ nome: 'Sofisa', limite: configuracoes.saldoLivreSofisa, vencimento: 1,  fechamento: 26, ciclo: 'dia30' });
+    }
 
     document.getElementById('loading-overlay').style.display = 'none';
     setStatus('☁️ Online', 'ok');
@@ -832,30 +1048,57 @@ function somaContasFixasCartao(cartao) {
     return contasFixas.filter(c => c.pagamento === cartao).reduce((t, c) => t + parseFloat(c.valor), 0);
 }
 function somaContasFixasCiclo(ciclo, excluirCartoes) {
+    const nomesCartoes = cartoes.map(c => 'Cartão ' + c.nome);
+    // fallback para compatibilidade com nomes antigos
+    const todosCartoes = [...new Set([...nomesCartoes, 'Cartão Nubank', 'Cartão Inter', 'Cartão Sofisa'])];
     return contasFixas
-        .filter(c => c.ciclo === ciclo && (!excluirCartoes || !['Cartão Nubank','Cartão Inter','Cartão Sofisa'].includes(c.pagamento)))
+        .filter(c => c.ciclo === ciclo && (!excluirCartoes || !todosCartoes.includes(c.pagamento)))
         .reduce((t, c) => t + parseFloat(c.valor), 0);
 }
 
 /* ===== DASHBOARD ===== */
 function atualizarDashboard() {
-    const fixasNubank = somaContasFixasCartao('Cartão Nubank');
-    const fixasInter = somaContasFixasCartao('Cartão Inter');
-
-    const faturaNubank = calcularFaturaNubank() + fixasNubank;
-    const faturaInter = calcularFaturaInter() + fixasInter;
-    const faturaSofisa = calcularFaturaSofisa();
-
-    document.getElementById('nubank-fatura-total').textContent = formatarMoeda(faturaNubank);
-    document.getElementById('nubank-limite').textContent = formatarMoeda((configuracoes.saldoLivreNubank || 0) - faturaNubank);
-
-    document.getElementById('inter-fatura-total').textContent = formatarMoeda(faturaInter);
-    document.getElementById('inter-limite').textContent = formatarMoeda((configuracoes.saldoLivreInter || 0) - faturaInter);
-
-    document.getElementById('sofisa-fatura-total').textContent = formatarMoeda(faturaSofisa);
-    document.getElementById('sofisa-limite').textContent = formatarMoeda((configuracoes.saldoLivreSofisa || 0) - faturaSofisa);
-
+    renderDashboardCartoes();
     atualizarResumoFinanceiro();
+}
+
+function renderDashboardCartoes() {
+    const dashboard = document.getElementById('dashboard-cards');
+    if (!dashboard) return;
+    dashboard.innerHTML = '';
+    const coresFallback = ['#8307bf|#9d33d9','#ff7a00|#ff9a3c','#1a1a1a|#2d2d2d','#0ea5e9|#38bdf8','#10b981|#34d399','#f59e0b|#fbbf24'];
+    if (cartoes.length === 0) {
+        dashboard.innerHTML = '<p style="color:var(--text-light);font-size:0.9rem;padding:0.5rem 0;width:100%;">Nenhum cartão cadastrado. Adicione cartões na aba Configurações.</p>';
+        return;
+    }
+    cartoes.forEach((c, i) => {
+        const corStr = (c.cor || coresFallback[i % coresFallback.length]);
+        const [cor1, cor2] = corStr.split('|');
+        const bandeiraIcons = {visa:'fab fa-cc-visa',mastercard:'fab fa-cc-mastercard',elo:'fas fa-credit-card',amex:'fab fa-cc-amex',hipercard:'fas fa-credit-card'};
+        const iconClass = bandeiraIcons[c.bandeira || 'mastercard'] || 'fab fa-cc-mastercard';
+        const fatura = getFaturaCartao(c.nome);
+        const saldoDisp = (parseFloat(c.limite) || 0) - fatura;
+        const saldoCor = saldoDisp >= 0 ? 'rgba(255,255,255,0.9)' : '#ff6b6b';
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.style.background = `linear-gradient(135deg, ${cor1}, ${cor2})`;
+        div.innerHTML = `
+            <div class="card-content">
+                <h3><i class="${iconClass}"></i> ${c.nome}</h3>
+                <div class="card-info">
+                    <span>Fatura atual:</span>
+                    <span>${formatarMoeda(fatura)}</span>
+                </div>
+                <div class="card-info">
+                    <span>Limite disponível:</span>
+                    <span style="color:${saldoCor}">${formatarMoeda(saldoDisp)}</span>
+                </div>
+                <div class="card-footer">
+                    <i class="far fa-calendar-alt"></i> Fecha dia ${c.fechamento} • Vence dia ${c.vencimento}
+                </div>
+            </div>`;
+        dashboard.appendChild(div);
+    });
 }
 
 /* ===== LANÇAMENTOS ===== */
@@ -912,17 +1155,50 @@ closeModal.addEventListener('click', () => modal.style.display = 'none');
 window.addEventListener('click', e => { if (e.target == modal) modal.style.display = 'none'; });
 
 /* ===== PAGAMENTOS ===== */
+function getFaturaCartao(nomeCartao) {
+    const nome = nomeCartao.toLowerCase();
+    if (nome.includes('nubank')) return calcularFaturaNubank() + somaContasFixasCartao('Cartão Nubank');
+    if (nome.includes('inter'))  return calcularFaturaInter()  + somaContasFixasCartao('Cartão Inter');
+    if (nome.includes('sofisa')) return calcularFaturaSofisa();
+    const nomeCartaoFull = 'Cartão ' + nomeCartao;
+    return lancamentos.filter(l => l.formaPagamento === nomeCartaoFull).reduce((t,l) => t + parseFloat(l.valor), 0)
+         + contasFixas.filter(c => c.pagamento === nomeCartaoFull).reduce((t,c) => t + parseFloat(c.valor), 0);
+}
+
 function atualizarPagamentos() {
-    const faturaNubank = calcularFaturaNubank() + somaContasFixasCartao('Cartão Nubank');
-    const faturaInter = calcularFaturaInter() + somaContasFixasCartao('Cartão Inter');
-    const faturaSofisa = calcularFaturaSofisa();
+    const salario15 = getSalarioCiclo('dia15');
+    const salario30 = getSalarioCiclo('dia30');
+
+    // Montar lista de faturas por ciclo a partir dos cartões cadastrados
+    const cartoes15 = cartoes.filter(c => c.ciclo === 'dia15');
+    const cartoes30 = cartoes.filter(c => c.ciclo === 'dia30');
+
+    const faturas15 = cartoes15.map(c => ({ nome: c.nome, fatura: getFaturaCartao(c.nome), limite: parseFloat(c.limite)||0 }));
+    const faturas30 = cartoes30.map(c => ({ nome: c.nome, fatura: getFaturaCartao(c.nome), limite: parseFloat(c.limite)||0 }));
+
+    const totalFaturas15 = faturas15.reduce((t,f) => t + f.fatura, 0);
+    const totalFaturas30 = faturas30.reduce((t,f) => t + f.fatura, 0);
     const fixasDia15SemCartao = somaContasFixasCiclo('dia15', true);
     const fixasDia30SemCartao = somaContasFixasCiclo('dia30', true);
 
-        function criarItemPagamento(label, valor) {
+    function criarItemPagamento(label, valor) {
         const div = document.createElement('div');
         div.className = 'payment-item';
         div.innerHTML = `<span>${label}:</span><span>${formatarMoeda(valor)}</span>`;
+        return div;
+    }
+
+    function criarItemFaturaCartao(label, valor, limite) {
+        const saldoDisp = limite - valor;
+        const saldoCor = saldoDisp >= 0 ? 'var(--success-color)' : 'var(--danger-color)';
+        const div = document.createElement('div');
+        div.className = 'payment-item';
+        div.innerHTML = `
+            <span>${label}:</span>
+            <span style="display:flex;flex-direction:column;align-items:flex-end;">
+                <span style="font-weight:600;">${formatarMoeda(valor)}</span>
+                ${limite > 0 ? `<small style="font-size:0.75rem;color:${saldoCor};font-weight:500;">${formatarMoeda(saldoDisp)}</small>` : ''}
+            </span>`;
         return div;
     }
 
@@ -930,37 +1206,46 @@ function atualizarPagamentos() {
     const items15 = document.getElementById('payment-dia15-items');
     items15.innerHTML = '';
     contasFixas.filter(c => c.ciclo === 'dia15' && c.destaque).forEach(c => {
-        items15.appendChild(criarItemPagamento(c.nome, parseFloat(c.valor)));
+        const item = criarItemPagamento(c.nome, parseFloat(c.valor));
+        if (c.pagamento === 'Boleto' && c.codbarras) {
+            const barcodeDiv = document.createElement('div');
+            barcodeDiv.style.cssText = 'font-size:0.72rem;color:var(--text-light);word-break:break-all;padding:0.2rem 0 0.5rem 0;font-family:monospace;width:100%;';
+            barcodeDiv.innerHTML = `<i class="fas fa-barcode" style="margin-right:0.3rem;"></i>${c.codbarras}`;
+            item.style.flexWrap = 'wrap';
+            item.appendChild(barcodeDiv);
+        }
+        items15.appendChild(item);
     });
-    items15.appendChild(criarItemPagamento('Fatura Nubank', faturaNubank));
-    const despesasDia15 = fixasDia15SemCartao + faturaNubank;
-    const investimentoDia15 = Math.max(0, (parseFloat(configuracoes.salario1) || 0) - despesasDia15);
+    faturas15.forEach(f => items15.appendChild(criarItemFaturaCartao('Fatura ' + f.nome, f.fatura, f.limite)));
+    const despesasDia15 = fixasDia15SemCartao + totalFaturas15;
+    const investimentoDia15 = Math.max(0, salario15 - despesasDia15);
     items15.appendChild(criarItemPagamento('Investir', investimentoDia15));
-    const totalDia15 = parseFloat(configuracoes.salario1) || 0;
-    const totalItem15 = criarItemPagamento('Total', totalDia15);
-    totalItem15.style.fontWeight = '600';
-    totalItem15.style.fontSize = '1.05rem';
-    totalItem15.style.paddingTop = '1.25rem';
-    totalItem15.style.borderBottom = 'none';
+    const totalItem15 = criarItemPagamento('Total', salario15);
+    totalItem15.style.fontWeight = '600'; totalItem15.style.fontSize = '1.05rem';
+    totalItem15.style.paddingTop = '1.25rem'; totalItem15.style.borderBottom = 'none';
     items15.appendChild(totalItem15);
 
     /* --- DIA 30 --- */
     const items30 = document.getElementById('payment-dia30-items');
     items30.innerHTML = '';
     contasFixas.filter(c => c.ciclo === 'dia30' && c.destaque).forEach(c => {
-        items30.appendChild(criarItemPagamento(c.nome, parseFloat(c.valor)));
+        const item = criarItemPagamento(c.nome, parseFloat(c.valor));
+        if (c.pagamento === 'Boleto' && c.codbarras) {
+            const barcodeDiv = document.createElement('div');
+            barcodeDiv.style.cssText = 'font-size:0.72rem;color:var(--text-light);word-break:break-all;padding:0.2rem 0 0.5rem 0;font-family:monospace;width:100%;';
+            barcodeDiv.innerHTML = `<i class="fas fa-barcode" style="margin-right:0.3rem;"></i>${c.codbarras}`;
+            item.style.flexWrap = 'wrap';
+            item.appendChild(barcodeDiv);
+        }
+        items30.appendChild(item);
     });
-    items30.appendChild(criarItemPagamento('Fatura Inter', faturaInter));
-    items30.appendChild(criarItemPagamento('Fatura Sofisa', faturaSofisa));
-    const despesasDia30 = fixasDia30SemCartao + faturaInter + faturaSofisa;
-    const investimentoDia30 = Math.max(0, (parseFloat(configuracoes.salario2) || 0) - despesasDia30);
+    faturas30.forEach(f => items30.appendChild(criarItemFaturaCartao('Fatura ' + f.nome, f.fatura, f.limite)));
+    const despesasDia30 = fixasDia30SemCartao + totalFaturas30;
+    const investimentoDia30 = Math.max(0, salario30 - despesasDia30);
     items30.appendChild(criarItemPagamento('Investir', investimentoDia30));
-    const totalDia30 = parseFloat(configuracoes.salario2) || 0;
-    const totalItem30 = criarItemPagamento('Total', totalDia30);
-    totalItem30.style.fontWeight = '600';
-    totalItem30.style.fontSize = '1.05rem';
-    totalItem30.style.paddingTop = '1.25rem';
-    totalItem30.style.borderBottom = 'none';
+    const totalItem30 = criarItemPagamento('Total', salario30);
+    totalItem30.style.fontWeight = '600'; totalItem30.style.fontSize = '1.05rem';
+    totalItem30.style.paddingTop = '1.25rem'; totalItem30.style.borderBottom = 'none';
     items30.appendChild(totalItem30);
 }
 
@@ -975,38 +1260,30 @@ function atualizarResumoFinanceiro() {
     const totalDespesasFixas = contasFixas.reduce((t, c) => t + (parseFloat(c.valor) || 0), 0);
 
     // INVESTIMENTOS: calculado igual à aba Pagamentos (sobra do salário após despesas de cada ciclo)
-    const faturaNubank = calcularFaturaNubank() + somaContasFixasCartao('Cartão Nubank');
-    const faturaInter  = calcularFaturaInter()  + somaContasFixasCartao('Cartão Inter');
-    const faturaSofisa = calcularFaturaSofisa();
-    const despesasDia15 = somaContasFixasCiclo('dia15', true) + faturaNubank;
-    const despesasDia30 = somaContasFixasCiclo('dia30', true) + faturaInter + faturaSofisa;
+    const faturas15tot = cartoes.filter(c=>c.ciclo==='dia15').map(c=>getFaturaCartao(c.nome)).reduce((t,v)=>t+v, 0);
+    const faturas30tot = cartoes.filter(c=>c.ciclo==='dia30').map(c=>getFaturaCartao(c.nome)).reduce((t,v)=>t+v, 0);
+    const despesasDia15 = somaContasFixasCiclo('dia15', true) + faturas15tot;
+    const despesasDia30 = somaContasFixasCiclo('dia30', true) + faturas30tot;
     const investimentoDia15 = Math.max(0, salario1 - despesasDia15);
     const investimentoDia30 = Math.max(0, salario2 - despesasDia30);
     const totalInvestimentos = investimentoDia15 + investimentoDia30;
 
-    // LIVRE: soma dos gastos reais nos cartoes (lancamentos da aba Lancamentos)
-    // Sempre reflete o que foi efetivamente gasto, seja menor, igual ou maior que o limite
-    // Se ultrapassar o limite configurado, o excesso e descontado dos investimentos
-    const limiteNubank  = parseFloat(configuracoes.saldoLivreNubank)  || 0;
-    const limiteInter   = parseFloat(configuracoes.saldoLivreInter)   || 0;
-    const limiteSofisa  = parseFloat(configuracoes.saldoLivreSofisa)  || 0;
-
-    // Gasto real em cada cartao (apenas lancamentos manuais, sem contas fixas)
+    // LIVRE: soma dos gastos reais nos cartões (lançamentos)
+    const limiteTotal = cartoes.reduce((t,c) => t + (parseFloat(c.limite)||0), 0) || (configuracoes.saldoLivreNubank||0) + (configuracoes.saldoLivreInter||0) + (configuracoes.saldoLivreSofisa||0);
     const gastoNubank = calcularFaturaNubank();
     const gastoInter  = calcularFaturaInter();
     const gastoSofisa = lancamentos.filter(l => l.formaPagamento === 'Cartão Sofisa').reduce((t, l) => t + parseFloat(l.valor), 0);
     let totalLivre = gastoNubank + gastoInter + gastoSofisa;
 
-    // Se ultrapassou o limite de algum cartao, o excesso sai dos investimentos
+    // limites individuais para cálculo de excesso
+    const limiteNubank  = parseFloat(configuracoes.saldoLivreNubank)  || 0;
+    const limiteInter   = parseFloat(configuracoes.saldoLivreInter)   || 0;
+    const limiteSofisa  = parseFloat(configuracoes.saldoLivreSofisa)  || 0;
     const excessoNubank = Math.max(0, gastoNubank - limiteNubank);
     const excessoInter  = Math.max(0, gastoInter  - limiteInter);
     const excessoSofisa = Math.max(0, gastoSofisa - limiteSofisa);
     const totalExcesso  = excessoNubank + excessoInter + excessoSofisa;
-    let totalInvestimentosAjustado = totalInvestimentos;
-    if (totalExcesso > 0) {
-        totalInvestimentosAjustado = Math.max(0, totalInvestimentos - totalExcesso);
-    }
-    const totalInvestimentosFinal = totalInvestimentosAjustado;
+    const totalInvestimentosFinal = totalExcesso > 0 ? Math.max(0, totalInvestimentos - totalExcesso) : totalInvestimentos;
 
     // PERCENTUAIS em relação às entradas
     function pct(valor) {
@@ -1025,7 +1302,7 @@ function atualizarResumoFinanceiro() {
 
     const livreEl = document.getElementById('saldo-mensal');
     livreEl.textContent = formatarMoeda(totalLivre);
-    livreEl.className   = totalLivre > limiteNubank + limiteInter + limiteSofisa ? 'resumo-value valor-negativo' : 'resumo-value valor-positivo';
+    livreEl.className   = totalLivre > limiteTotal ? 'resumo-value valor-negativo' : 'resumo-value valor-positivo';
     document.getElementById('pct-livre').textContent = pct(totalLivre);
 
     atualizarGraficoBalanco(totalEntradas, totalDespesasFixas, totalInvestimentosFinal, totalLivre);
@@ -1051,13 +1328,153 @@ function atualizarGraficoBalanco(entradas, despesas, investimentos, saldo) {
     });
 }
 
+
+/* ===== ATUALIZAR SELECTS DE FORMA DE PAGAMENTO COM CARTÕES DINÂMICOS ===== */
+function atualizarSelectsPagamento() {
+    const cartaoOpts = cartoes.map(c => `<option value="Cartão ${c.nome}">Cartão ${c.nome}</option>`).join('');
+    const base = `<option value="">Selecione</option>${cartaoOpts}<option value="PIX">PIX</option><option value="Boleto">Boleto</option><option value="Débito Automático">Débito Automático</option>`;
+    ['forma-pagamento','edit-forma-pagamento'].forEach(id => {
+        const sel = document.getElementById(id);
+        if (!sel) return;
+        const cur = sel.value;
+        sel.innerHTML = base;
+        if (cur) sel.value = cur;
+    });
+    // cf-pagamento tem opções ligeiramente diferentes (sem "Selecione")
+    const cfSel = document.getElementById('cf-pagamento');
+    if (cfSel) {
+        const cur = cfSel.value;
+        cfSel.innerHTML = cartaoOpts + '<option value="PIX">PIX</option><option value="Boleto">Boleto</option><option value="Débito Automático">Débito Automático</option>';
+        if (cur) cfSel.value = cur;
+    }
+}
+
 /* ===== CONFIGURAÇÕES ===== */
+function getSalarioCiclo(ciclo) {
+    const lista = salarios.filter(s => s.ciclo === ciclo);
+    if (lista.length === 0) return 0;
+    lista.sort((a, b) => b.data.localeCompare(a.data));
+    return parseFloat(lista[0].valor) || 0;
+}
+
+function getCartaoPorNome(nome) {
+    return cartoes.find(c => c.nome.toLowerCase() === nome.toLowerCase()) || null;
+}
+
+function getLimiteCartao(nome) {
+    const c = getCartaoPorNome(nome);
+    return c ? (parseFloat(c.limite) || 0) : 0;
+}
+
 function carregarConfiguracoes() {
-    document.getElementById('salario1').value = configuracoes.salario1 || '';
-    document.getElementById('salario2').value = configuracoes.salario2 || '';
-    document.getElementById('saldo-livre-nubank').value = configuracoes.saldoLivreNubank || '';
-    document.getElementById('saldo-livre-inter').value = configuracoes.saldoLivreInter || '';
-    document.getElementById('saldo-livre-sofisa').value = configuracoes.saldoLivreSofisa || '';
+    // Atualiza configuracoes com os valores mais recentes de salarios/cartoes para compatibilidade
+    configuracoes.salario1 = getSalarioCiclo('dia15');
+    configuracoes.salario2 = getSalarioCiclo('dia30');
+    const nubank = cartoes.find(c => c.ciclo === 'dia15');
+    const inter  = cartoes.find(c => c.ciclo === 'dia30' && c.nome.toLowerCase().includes('inter'));
+    const sofisa = cartoes.find(c => c.ciclo === 'dia30' && c.nome.toLowerCase().includes('sofisa'));
+    configuracoes.saldoLivreNubank = nubank ? (parseFloat(nubank.limite) || 0) : 0;
+    configuracoes.saldoLivreInter  = inter  ? (parseFloat(inter.limite)  || 0) : 0;
+    configuracoes.saldoLivreSofisa = sofisa ? (parseFloat(sofisa.limite) || 0) : 0;
+    renderSalarios();
+    renderCartoes();
+    atualizarSelectsPagamento();
+}
+
+function renderSalarios() {
+    const lista = document.getElementById('lista-salarios');
+    if (!lista) return;
+    lista.innerHTML = '';
+    if (salarios.length === 0) {
+        lista.innerHTML = '<p style="color:var(--text-light);font-size:0.9rem;padding:0.5rem 0;">Nenhum salário cadastrado ainda.</p>';
+        return;
+    }
+    const sorted = [...salarios].sort((a,b) => b.data.localeCompare(a.data));
+    sorted.forEach((s, i) => {
+        const realIdx = salarios.indexOf(s);
+        const [ano,mes,dia] = s.data.split('-');
+        const div = document.createElement('div');
+        div.className = 'conta-fixa-card';
+        div.innerHTML = `
+            <div class="conta-fixa-info">
+                <span class="conta-fixa-nome"><i class="fas fa-money-bill-wave" style="color:var(--success-color);margin-right:0.4rem;"></i> ${s.ciclo === 'dia15' ? 'Dia 15' : 'Dia 30'}</span>
+                <span class="conta-fixa-valor">${formatarMoeda(parseFloat(s.valor))}</span>
+                <span class="conta-fixa-badge badge-prazo-fixo"><i class="fas fa-calendar-alt"></i> ${dia}/${mes}/${ano}</span>
+            </div>
+            <div class="conta-fixa-acoes">
+                <button class="action-btn edit-btn" title="Editar" onclick="editarSalario(${realIdx})">✎</button>
+                <button class="action-btn delete-btn" title="Excluir" onclick="excluirSalario(${realIdx})">×</button>
+            </div>`;
+        lista.appendChild(div);
+    });
+}
+
+function excluirSalario(index) {
+    if (!confirm('Excluir este salário?')) return;
+    salarios.splice(index, 1);
+    salvarFirebase('salarios', salarios);
+    carregarConfiguracoes(); atualizarDashboard(); atualizarPagamentos();
+}
+
+function editarSalario(index) {
+    // abre modal
+    const s = salarios[index];
+    document.getElementById('sal-data-m').value = s.data;
+    document.getElementById('sal-valor-m').value = s.valor;
+    document.getElementById('sal-ciclo-m').value = s.ciclo;
+    document.getElementById('sal-edit-index-m').value = index;
+    document.getElementById('form-salario-titulo-modal').innerHTML = '<i class="fas fa-edit"></i> Editar Salário';
+    document.getElementById('modalSalario').style.display = 'block';
+}
+
+
+function renderCartoes() {
+    const lista = document.getElementById('lista-cartoes');
+    if (!lista) return;
+    lista.innerHTML = '';
+    if (cartoes.length === 0) {
+        lista.innerHTML = '<p style="color:var(--text-light);font-size:0.9rem;padding:0.5rem 0;">Nenhum cartão cadastrado ainda.</p>';
+        return;
+    }
+    cartoes.forEach((c, i) => {
+        const div = document.createElement('div');
+        div.className = 'conta-fixa-card';
+        div.innerHTML = `
+            <div class="conta-fixa-info">
+                <span class="conta-fixa-nome"><i class="fas fa-credit-card" style="margin-right:0.4rem;"></i> ${c.nome}</span>
+                <span class="conta-fixa-valor">${formatarMoeda(parseFloat(c.limite))}</span>
+                <span class="conta-fixa-badge badge-prazo-fixo"><i class="fas fa-calendar-alt"></i> Vence dia ${c.vencimento}</span>
+                <span class="conta-fixa-badge badge-pag-boleto"><i class="fas fa-lock"></i> Fecha dia ${c.fechamento}</span>
+                <span class="conta-fixa-badge" style="background:rgba(99,102,241,0.08);color:var(--primary-color);">${c.ciclo === 'dia15' ? 'Dia 15' : 'Dia 30'}</span>
+            </div>
+            <div class="conta-fixa-acoes">
+                <button class="action-btn edit-btn" title="Editar" onclick="editarCartao(${i})">✎</button>
+                <button class="action-btn delete-btn" title="Excluir" onclick="excluirCartao(${i})">×</button>
+            </div>`;
+        lista.appendChild(div);
+    });
+}
+
+function excluirCartao(index) {
+    if (!confirm(`Excluir cartão "${cartoes[index].nome}"?`)) return;
+    cartoes.splice(index, 1);
+    salvarFirebase('cartoes', cartoes);
+    carregarConfiguracoes(); atualizarDashboard(); atualizarPagamentos();
+}
+
+function editarCartao(index) {
+    const c = cartoes[index];
+    document.getElementById('cart-nome').value       = c.nome;
+    document.getElementById('cart-limite').value     = c.limite;
+    document.getElementById('cart-vencimento').value = c.vencimento;
+    document.getElementById('cart-fechamento').value = c.fechamento;
+    document.getElementById('cart-ciclo').value      = c.ciclo || 'dia15';
+    document.getElementById('cart-bandeira').value   = c.bandeira || 'mastercard';
+    const cor = c.cor || '#8307bf|#6610f2';
+    document.getElementById('cart-cor-value').value  = cor;
+    if (window.cpInitPicker) window.cpInitPicker(cor);
+    if (window.cpUpdatePreview) setTimeout(window.cpUpdatePreview, 50);
+    abrirModalCartao(index);
 }
 
 /* ===== CONTAS FIXAS ===== */
@@ -1140,21 +1557,24 @@ function excluirContaFixa(index) {
 
 function editarContaFixa(index) {
     const c = contasFixas[index];
-    document.getElementById('cf-nome').value = c.nome;
-    document.getElementById('cf-valor').value = c.valor;
-    document.getElementById('cf-variavel').value = c.variavel || 'nao';
-    document.getElementById('cf-prazo').value = c.prazo;
-    document.getElementById('cf-pagamento').value = c.pagamento;
-    document.getElementById('cf-ciclo').value = c.ciclo;
-    document.getElementById('cf-parcelas').value = c.parcelas || '';
-    document.getElementById('cf-data-venc').value = c.dataVenc || '';
-    document.getElementById('cf-destaque').checked = c.destaque || false;
-    document.getElementById('cf-edit-index').value = index;
-    document.getElementById('form-conta-titulo').innerHTML = '<i class="fas fa-edit"></i> Editar Conta';
-    document.getElementById('form-add-conta-wrapper').style.display = 'block';
-    document.getElementById('btn-show-form-conta').style.display = 'none';
-    atualizarVisibilidadePrazo();
+    atualizarSelectContaFixaModal();
+    document.getElementById('cf-nome-m').value = c.nome;
+    document.getElementById('cf-valor-m').value = c.valor;
+    document.getElementById('cf-variavel-m').value = c.variavel || 'nao';
+    document.getElementById('cf-prazo-m').value = c.prazo;
+    document.getElementById('cf-pagamento-m').value = c.pagamento;
+    document.getElementById('cf-ciclo-m').value = c.ciclo;
+    document.getElementById('cf-parcelas-m').value = c.parcelas || '';
+    document.getElementById('cf-data-venc-m').value = c.dataVenc || '';
+    document.getElementById('cf-destaque-m').checked = c.destaque || false;
+    document.getElementById('cf-codbarras-m').value = c.codbarras || '';
+    document.getElementById('cf-codbarras-group-m').style.display = c.pagamento === 'Boleto' ? '' : 'none';
+    document.getElementById('cf-edit-index-m').value = index;
+    document.getElementById('form-conta-titulo-modal').innerHTML = '<i class="fas fa-edit"></i> Editar Conta';
+    atualizarVisibilidadePrazoModal();
+    document.getElementById('modalContaFixa').style.display = 'block';
 }
+
 
 function atualizarVisibilidadePrazo() {
     const prazo = document.getElementById('cf-prazo').value;
@@ -1260,25 +1680,54 @@ function gerarRelatorioPagamento(dia) {
     const total15 = parseFloat(configuracoes.salario1) || 0;
     const total30 = parseFloat(configuracoes.salario2) || 0;
     if (dia === 15) {
-        relatorio += `📊 *Pagamentos do dia 15:*\n`;
+        relatorio += `📊 *Pagamentos do dia 15:*\n\n`;
         contasFixas.filter(c => c.ciclo === 'dia15' && c.destaque).forEach(c => {
-            relatorio += `${emojiConta(c.nome)} ${c.nome}: ${formatarMoeda(parseFloat(c.valor))}\n`;
+            relatorio += `${emojiConta(c.nome)} ${c.nome}: ${formatarMoeda(parseFloat(c.valor))}`;
+            if (c.pagamento === 'Boleto' && c.codbarras) {
+                relatorio += `\n   📋 Código: ${c.codbarras}`;
+            }
+            relatorio += `\n`;
         });
-        relatorio += `💳 Fatura Nubank: ${formatarMoeda(faturaNubankVal)}\n`;
+        // Buscar nome do cartão dia15 nos cartoes cadastrados
+        const cartaoDia15 = cartoes.find(c => c.ciclo === 'dia15');
+        const nomeFatura15 = cartaoDia15 ? cartaoDia15.nome : 'Nubank';
+        relatorio += `💳 Fatura ${nomeFatura15}: ${formatarMoeda(faturaNubankVal)}\n`;
         relatorio += `📈 Investir: ${formatarMoeda(invest15)}\n`;
-        relatorio += `💰 *Total*: ${formatarMoeda(total15)}`;
+        relatorio += `\n💰 *Total*: ${formatarMoeda(total15)}`;
         lancamentos = lancamentos.filter(l => l.formaPagamento !== 'Cartão Nubank');
+        // Excluir contas de data específica do ciclo dia15; zerar apenas as variáveis
+        contasFixas = contasFixas.filter(c => !(c.ciclo === 'dia15' && c.prazo === 'personalizado'));
+        contasFixas.forEach((c,i) => {
+            if (c.ciclo === 'dia15' && c.variavel === 'sim')
+                contasFixas[i].valor = 0;
+        });
+        salvarFirebase('contasFixas', contasFixas);
     }
     if (dia === 30) {
-        relatorio += `📊 *Pagamentos do dia 30:*\n`;
+        relatorio += `📊 *Pagamentos do dia 30:*\n\n`;
         contasFixas.filter(c => c.ciclo === 'dia30' && c.destaque).forEach(c => {
-            relatorio += `${emojiConta(c.nome)} ${c.nome}: ${formatarMoeda(parseFloat(c.valor))}\n`;
+            relatorio += `${emojiConta(c.nome)} ${c.nome}: ${formatarMoeda(parseFloat(c.valor))}`;
+            if (c.pagamento === 'Boleto' && c.codbarras) {
+                relatorio += `\n   📋 Código: ${c.codbarras}`;
+            }
+            relatorio += `\n`;
         });
-        relatorio += `💳 Fatura Inter: ${formatarMoeda(faturaInterVal)}\n`;
-        relatorio += `💳 Fatura Sofisa: ${formatarMoeda(faturaSofisaVal)}\n`;
+        // Buscar nomes dos cartões dia30
+        const cartoesDia30 = cartoes.filter(c => c.ciclo === 'dia30');
+        const nomeInter  = cartoesDia30.find(c => c.nome.toLowerCase().includes('inter'))?.nome  || 'Inter';
+        const nomeSofisa = cartoesDia30.find(c => c.nome.toLowerCase().includes('sofisa'))?.nome || 'Sofisa';
+        relatorio += `💳 Fatura ${nomeInter}: ${formatarMoeda(faturaInterVal)}\n`;
+        relatorio += `💳 Fatura ${nomeSofisa}: ${formatarMoeda(faturaSofisaVal)}\n`;
         relatorio += `📈 Investir: ${formatarMoeda(invest30)}\n`;
-        relatorio += `💰 *Total*: ${formatarMoeda(total30)}`;
+        relatorio += `\n💰 *Total*: ${formatarMoeda(total30)}`;
         lancamentos = lancamentos.filter(l => l.formaPagamento !== 'Cartão Inter' && l.formaPagamento !== 'Cartão Sofisa');
+        // Excluir contas de data específica do ciclo dia30; zerar apenas as variáveis
+        contasFixas = contasFixas.filter(c => !(c.ciclo === 'dia30' && c.prazo === 'personalizado'));
+        contasFixas.forEach((c,i) => {
+            if (c.ciclo === 'dia30' && c.variavel === 'sim')
+                contasFixas[i].valor = 0;
+        });
+        salvarFirebase('contasFixas', contasFixas);
     }
     salvarFirebase('lancamentos', lancamentos);
     atualizarTabelaLancamentos(); atualizarDashboard(); atualizarPagamentos();
@@ -1310,18 +1759,221 @@ document.getElementById('form-lancamento').addEventListener('submit', function(e
     document.getElementById('data').value = new Date().toISOString().split('T')[0];
     atualizarTabelaLancamentos(); atualizarDashboard(); atualizarPagamentos();
 });
-document.getElementById('form-configuracoes').addEventListener('submit', function(e) {
-    e.preventDefault();
-    configuracoes = {
-        salario1: parseFloat(document.getElementById('salario1').value) || 0,
-        salario2: parseFloat(document.getElementById('salario2').value) || 0,
-        saldoLivreNubank: parseFloat(document.getElementById('saldo-livre-nubank').value) || 0,
-        saldoLivreInter: parseFloat(document.getElementById('saldo-livre-inter').value) || 0,
-        saldoLivreSofisa: parseFloat(document.getElementById('saldo-livre-sofisa').value) || 0
-    };
-    salvarFirebase('configuracoes', configuracoes);
-    alert('Configurações salvas com sucesso!');
-    atualizarDashboard(); atualizarPagamentos();
+// ─── Salário event listeners ───────────────────────────
+/* listeners antigos de salario removidos - substituídos por modal */
+document.getElementById('btn-salvar-salario').addEventListener('click', () => {
+    const data  = document.getElementById('sal-data').value;
+    const valor = parseFloat(document.getElementById('sal-valor').value) || 0;
+    const ciclo = document.getElementById('sal-ciclo').value;
+    if (!data || valor <= 0) { alert('Preencha a data e o valor do salário.'); return; }
+    const sal = { data, valor, ciclo };
+    const editIndex = parseInt(document.getElementById('sal-edit-index').value);
+    if (editIndex >= 0) salarios[editIndex] = sal;
+    else salarios.push(sal);
+    salvarFirebase('salarios', salarios);
+    document.getElementById('form-add-salario-wrapper').style.display = 'none';
+    document.getElementById('btn-show-form-salario').style.display = '';
+    carregarConfiguracoes(); atualizarDashboard(); atualizarPagamentos();
+});
+
+// ─── Cartão event listeners ────────────────────────────
+// ═══ COLOR PICKER ════════════════════════════════════════════════════
+(function() {
+    // Estado interno do picker
+    let cpHue = 270, cpSat = 0.8, cpVal = 0.85;
+
+    function hsvToHex(h, s, v) {
+        const f = (n, k = (n + h / 60) % 6) => v - v * s * Math.max(Math.min(k, 4 - k, 1), 0);
+        const r = Math.round(f(5) * 255), g = Math.round(f(3) * 255), b = Math.round(f(1) * 255);
+        return '#' + [r,g,b].map(x => x.toString(16).padStart(2,'0')).join('');
+    }
+
+    function drawSV() {
+        const canvas = document.getElementById('cp-sv');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width, H = canvas.height;
+        // Gradiente horizontal branco → cor pura
+        const hueHex = hsvToHex(cpHue, 1, 1);
+        const gW = ctx.createLinearGradient(0,0,W,0);
+        gW.addColorStop(0, '#fff'); gW.addColorStop(1, hueHex);
+        ctx.fillStyle = gW; ctx.fillRect(0,0,W,H);
+        // Gradiente vertical transparente → preto
+        const gB = ctx.createLinearGradient(0,0,0,H);
+        gB.addColorStop(0,'rgba(0,0,0,0)'); gB.addColorStop(1,'#000');
+        ctx.fillStyle = gB; ctx.fillRect(0,0,W,H);
+        // Cursor
+        const cursor = document.getElementById('cp-sv-cursor');
+        if (cursor) {
+            cursor.style.left  = (cpSat * 100) + '%';
+            cursor.style.top   = ((1 - cpVal) * 100) + '%';
+            cursor.style.background = hsvToHex(cpHue, cpSat, cpVal);
+        }
+    }
+
+    function drawHue() {
+        const canvas = document.getElementById('cp-hue');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width, H = canvas.height;
+        const g = ctx.createLinearGradient(0,0,W,0);
+        for (let i=0; i<=360; i+=10) g.addColorStop(i/360, `hsl(${i},100%,50%)`);
+        ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+        // Cursor
+        const cursor = document.getElementById('cp-hue-cursor');
+        if (cursor) {
+            cursor.style.left = (cpHue / 360 * 100) + '%';
+            cursor.style.background = `hsl(${cpHue},100%,50%)`;
+        }
+    }
+
+    function updatePreviewAndValue() {
+        const cor1 = hsvToHex(cpHue, cpSat, cpVal);
+        const cor2 = hsvToHex(cpHue, Math.min(cpSat + 0.15, 1), Math.max(cpVal - 0.2, 0));
+        const val  = cor1 + '|' + cor2;
+        const inp  = document.getElementById('cart-cor-value');
+        if (inp) inp.value = val;
+        const prev = document.getElementById('cp-preview');
+        if (prev) prev.style.background = `linear-gradient(135deg,${cor1},${cor2})`;
+        // Preview nome
+        const nomeEl = document.getElementById('cp-preview-nome');
+        const nomeInput = document.getElementById('cart-nome');
+        if (nomeEl && nomeInput) nomeEl.textContent = nomeInput.value || 'Meu Cartão';
+        // Preview ícone bandeira
+        const iconEl = document.getElementById('cp-preview-icon');
+        const bandeiraEl = document.getElementById('cart-bandeira');
+        if (iconEl && bandeiraEl) {
+            const icons = {mastercard:'fab fa-cc-mastercard',visa:'fab fa-cc-visa',elo:'fas fa-credit-card',amex:'fab fa-cc-amex',hipercard:'fas fa-credit-card'};
+            iconEl.className = icons[bandeiraEl.value] || 'fab fa-cc-mastercard';
+            iconEl.style.fontSize = '1.5rem';
+        }
+        drawSV();
+    }
+
+    function setCpFromHex(hex) {
+        // Parse hex → HSV para restaurar estado ao editar
+        hex = hex.replace('#','');
+        if (hex.length !== 6) return;
+        const r = parseInt(hex.substr(0,2),16)/255;
+        const g = parseInt(hex.substr(2,2),16)/255;
+        const b = parseInt(hex.substr(4,2),16)/255;
+        const max = Math.max(r,g,b), min = Math.min(r,g,b), d = max - min;
+        cpVal = max;
+        cpSat = max === 0 ? 0 : d / max;
+        if (d === 0) cpHue = 0;
+        else if (max === r) cpHue = 60 * (((g-b)/d) % 6);
+        else if (max === g) cpHue = 60 * ((b-r)/d + 2);
+        else cpHue = 60 * ((r-g)/d + 4);
+        if (cpHue < 0) cpHue += 360;
+    }
+
+    function initPicker(hexValue) {
+        if (hexValue && hexValue.includes('|')) {
+            setCpFromHex(hexValue.split('|')[0]);
+        } else {
+            cpHue = 270; cpSat = 0.80; cpVal = 0.85;
+        }
+        drawHue(); drawSV(); updatePreviewAndValue();
+    }
+
+    // Drag helpers
+    function dragHandler(canvas, onMove) {
+        function getXY(e) {
+            const r = canvas.getBoundingClientRect();
+            const src = e.touches ? e.touches[0] : e;
+            return [src.clientX - r.left, src.clientY - r.top, r.width, r.height];
+        }
+        let active = false;
+        canvas.addEventListener('mousedown',  e => { active = true; onMove(...getXY(e)); });
+        canvas.addEventListener('touchstart', e => { active = true; e.preventDefault(); onMove(...getXY(e)); }, {passive:false});
+        window.addEventListener('mousemove',  e => { if (active) onMove(...getXY(e)); });
+        window.addEventListener('touchmove',  e => { if (active) { e.preventDefault(); onMove(...getXY(e)); } }, {passive:false});
+        window.addEventListener('mouseup',  () => active = false);
+        window.addEventListener('touchend', () => active = false);
+    }
+
+    // Inicializar após DOM
+    document.addEventListener('DOMContentLoaded', () => {
+        const svCanvas  = document.getElementById('cp-sv');
+        const hueCanvas = document.getElementById('cp-hue');
+        if (!svCanvas || !hueCanvas) return;
+
+        dragHandler(svCanvas, (x, y, W, H) => {
+            cpSat = Math.max(0, Math.min(1, x / W));
+            cpVal = Math.max(0, Math.min(1, 1 - y / H));
+            updatePreviewAndValue();
+        });
+        dragHandler(hueCanvas, (x, y, W) => {
+            cpHue = Math.max(0, Math.min(360, x / W * 360));
+            drawSV(); updatePreviewAndValue();
+        });
+
+        // Atualizar preview ao digitar nome ou mudar bandeira
+        document.getElementById('cart-nome').addEventListener('input', updatePreviewAndValue);
+        document.getElementById('cart-bandeira').addEventListener('change', updatePreviewAndValue);
+
+        // Redesenhar quando o modal abrir (canvas precisa de tamanho real)
+        const observer = new MutationObserver(() => {
+            if (document.getElementById('modalCartao').style.display !== 'none') {
+                drawHue(); drawSV();
+            }
+        });
+        observer.observe(document.getElementById('modalCartao'), {attributes: true, attributeFilter: ['style']});
+
+        drawHue(); drawSV();
+    });
+
+    // Expor para uso externo
+    window.cpInitPicker = initPicker;
+    window.cpUpdatePreview = updatePreviewAndValue;
+})();
+
+// ═══ MODAL CARTÃO — abrir / fechar / salvar ═══════════════════════════
+function abrirModalCartao(editIndex) {
+    const isEdit = editIndex >= 0;
+    document.getElementById('cart-edit-index').value = editIndex;
+    document.getElementById('form-cartao-titulo').innerHTML = isEdit
+        ? '<i class="fas fa-edit"></i> Editar Cartão'
+        : '<i class="fas fa-plus-circle"></i> Novo Cartão';
+    if (!isEdit) {
+        ['cart-nome','cart-limite','cart-vencimento','cart-fechamento'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('cart-ciclo').value    = 'dia15';
+        document.getElementById('cart-bandeira').value = 'mastercard';
+        document.getElementById('cart-cor-value').value = '#8307bf|#6610f2';
+        if (window.cpInitPicker) window.cpInitPicker('#8307bf|#6610f2');
+    }
+    document.getElementById('modalCartao').style.display = 'block';
+}
+
+document.getElementById('btn-show-form-cartao').addEventListener('click', () => abrirModalCartao(-1));
+
+document.getElementById('btn-cancelar-cartao').addEventListener('click', () => {
+    document.getElementById('modalCartao').style.display = 'none';
+});
+document.getElementById('closeModalCartao').addEventListener('click', () => {
+    document.getElementById('modalCartao').style.display = 'none';
+});
+window.addEventListener('click', e => {
+    if (e.target === document.getElementById('modalCartao'))
+        document.getElementById('modalCartao').style.display = 'none';
+});
+
+document.getElementById('btn-salvar-cartao').addEventListener('click', () => {
+    const nome       = document.getElementById('cart-nome').value.trim();
+    const limite     = parseFloat(document.getElementById('cart-limite').value) || 0;
+    const vencimento = parseInt(document.getElementById('cart-vencimento').value) || 0;
+    const fechamento = parseInt(document.getElementById('cart-fechamento').value) || 0;
+    const ciclo      = document.getElementById('cart-ciclo').value;
+    if (!nome || limite <= 0 || vencimento <= 0 || fechamento <= 0) { alert('Preencha todos os campos do cartão.'); return; }
+    const cor      = document.getElementById('cart-cor-value').value || '#8307bf|#6610f2';
+    const bandeira = document.getElementById('cart-bandeira').value || 'mastercard';
+    const cart     = { nome, limite, vencimento, fechamento, ciclo, cor, bandeira };
+    const editIndex = parseInt(document.getElementById('cart-edit-index').value);
+    if (editIndex >= 0) cartoes[editIndex] = cart;
+    else cartoes.push(cart);
+    salvarFirebase('cartoes', cartoes);
+    document.getElementById('modalCartao').style.display = 'none';
+    carregarConfiguracoes(); atualizarDashboard(); atualizarPagamentos();
 });
 
 document.querySelectorAll('input[name="payment-date"]').forEach(radio => {
@@ -1377,32 +2029,28 @@ document.getElementById('form-edicao-apartamento').addEventListener('submit', fu
 
 document.getElementById('cf-prazo').addEventListener('change', atualizarVisibilidadePrazo);
 
-document.getElementById('btn-show-form-conta').addEventListener('click', () => {
-    document.getElementById('cf-edit-index').value = -1;
-    document.getElementById('form-conta-titulo').innerHTML = '<i class="fas fa-plus-circle"></i> Nova Conta';
-    document.getElementById('cf-destaque').checked = false;
-    document.getElementById('form-add-conta-wrapper').style.display = 'block';
-    document.getElementById('btn-show-form-conta').style.display = 'none';
+// Mostrar/ocultar campo de código de barras conforme forma de pagamento
+document.getElementById('cf-pagamento').addEventListener('change', function() {
+    document.getElementById('cf-codbarras-group').style.display = this.value === 'Boleto' ? '' : 'none';
 });
 
-document.getElementById('btn-cancelar-conta').addEventListener('click', () => {
-    document.getElementById('form-add-conta-wrapper').style.display = 'none';
-    document.getElementById('btn-show-form-conta').style.display = '';
-});
+/* listeners antigos de conta removidos - substituídos por modal */
 
 document.getElementById('btn-salvar-conta').addEventListener('click', () => {
     const nome = document.getElementById('cf-nome').value.trim();
     const valor = parseFloat(document.getElementById('cf-valor').value) || 0;
     if (!nome || valor <= 0) { alert('Preencha nome e valor.'); return; }
+    const pagamento = document.getElementById('cf-pagamento').value;
     const conta = {
         nome, valor,
         variavel: document.getElementById('cf-variavel').value,
         prazo: document.getElementById('cf-prazo').value,
-        pagamento: document.getElementById('cf-pagamento').value,
+        pagamento,
         ciclo: document.getElementById('cf-ciclo').value,
         parcelas: document.getElementById('cf-parcelas').value || null,
         dataVenc: document.getElementById('cf-data-venc').value || null,
-        destaque: document.getElementById('cf-destaque').checked
+        destaque: document.getElementById('cf-destaque').checked,
+        codbarras: pagamento === 'Boleto' ? (document.getElementById('cf-codbarras').value.trim() || null) : null
     };
     const editIndex = parseInt(document.getElementById('cf-edit-index').value);
     if (editIndex >= 0) contasFixas[editIndex] = conta;
@@ -1412,6 +2060,97 @@ document.getElementById('btn-salvar-conta').addEventListener('click', () => {
     document.getElementById('btn-show-form-conta').style.display = '';
     renderContasFixas(); atualizarDashboard(); atualizarPagamentos();
 });
+
+
+// ═══ MODAL SALÁRIO ════════════════════════════════════════════════════
+document.getElementById('btn-show-form-salario').addEventListener('click', () => {
+    document.getElementById('sal-edit-index-m').value = -1;
+    document.getElementById('form-salario-titulo-modal').innerHTML = '<i class="fas fa-plus-circle"></i> Novo Salário';
+    document.getElementById('sal-data-m').value = new Date().toISOString().split('T')[0];
+    document.getElementById('sal-valor-m').value = '';
+    document.getElementById('sal-ciclo-m').value = 'dia15';
+    document.getElementById('modalSalario').style.display = 'block';
+});
+
+document.getElementById('btn-salvar-salario-m').addEventListener('click', () => {
+    const data  = document.getElementById('sal-data-m').value;
+    const valor = parseFloat(document.getElementById('sal-valor-m').value) || 0;
+    const ciclo = document.getElementById('sal-ciclo-m').value;
+    if (!data || valor <= 0) { alert('Preencha a data e o valor do salário.'); return; }
+    const sal = { data, valor, ciclo };
+    const editIndex = parseInt(document.getElementById('sal-edit-index-m').value);
+    if (editIndex >= 0) salarios[editIndex] = sal;
+    else salarios.push(sal);
+    salvarFirebase('salarios', salarios);
+    document.getElementById('modalSalario').style.display = 'none';
+    carregarConfiguracoes(); atualizarDashboard(); atualizarPagamentos();
+});
+
+window.addEventListener('click', e => { if (e.target == document.getElementById('modalSalario')) document.getElementById('modalSalario').style.display = 'none'; });
+
+// ═══ MODAL CONTA FIXA ════════════════════════════════════════════════
+function atualizarVisibilidadePrazoModal() {
+    const prazo = document.getElementById('cf-prazo-m').value;
+    document.getElementById('cf-parcelas-group-m').style.display = prazo === 'parcelas' ? '' : 'none';
+    document.getElementById('cf-data-group-m').style.display = prazo === 'personalizado' ? '' : 'none';
+}
+
+document.getElementById('cf-pagamento-m').addEventListener('change', function() {
+    document.getElementById('cf-codbarras-group-m').style.display = this.value === 'Boleto' ? '' : 'none';
+});
+
+function atualizarSelectContaFixaModal() {
+    const sel = document.getElementById('cf-pagamento-m');
+    if (!sel) return;
+    const cur = sel.value;
+    const cartaoOpts = cartoes.map(c => `<option value="Cartão ${c.nome}">Cartão ${c.nome}</option>`).join('');
+    sel.innerHTML = cartaoOpts + '<option value="PIX">PIX</option><option value="Boleto">Boleto</option><option value="Débito Automático">Débito Automático</option>';
+    if (cur) sel.value = cur;
+}
+
+document.getElementById('btn-show-form-conta').addEventListener('click', () => {
+    document.getElementById('cf-edit-index-m').value = -1;
+    document.getElementById('form-conta-titulo-modal').innerHTML = '<i class="fas fa-plus-circle"></i> Nova Conta';
+    document.getElementById('cf-nome-m').value = '';
+    document.getElementById('cf-valor-m').value = '';
+    document.getElementById('cf-variavel-m').value = 'nao';
+    document.getElementById('cf-prazo-m').value = 'dia15';
+    document.getElementById('cf-ciclo-m').value = 'dia15';
+    document.getElementById('cf-destaque-m').checked = false;
+    document.getElementById('cf-codbarras-m').value = '';
+    document.getElementById('cf-codbarras-group-m').style.display = 'none';
+    document.getElementById('cf-parcelas-group-m').style.display = 'none';
+    document.getElementById('cf-data-group-m').style.display = 'none';
+    atualizarSelectContaFixaModal();
+    document.getElementById('modalContaFixa').style.display = 'block';
+});
+
+document.getElementById('btn-salvar-conta-m').addEventListener('click', () => {
+    const nome = document.getElementById('cf-nome-m').value.trim();
+    const valor = parseFloat(document.getElementById('cf-valor-m').value) || 0;
+    if (!nome || valor <= 0) { alert('Preencha nome e valor.'); return; }
+    const pagamento = document.getElementById('cf-pagamento-m').value;
+    const conta = {
+        nome, valor,
+        variavel: document.getElementById('cf-variavel-m').value,
+        prazo: document.getElementById('cf-prazo-m').value,
+        pagamento,
+        ciclo: document.getElementById('cf-ciclo-m').value,
+        parcelas: document.getElementById('cf-parcelas-m').value || null,
+        dataVenc: document.getElementById('cf-data-venc-m').value || null,
+        destaque: document.getElementById('cf-destaque-m').checked,
+        codbarras: pagamento === 'Boleto' ? (document.getElementById('cf-codbarras-m').value.trim() || null) : null
+    };
+    const editIndex = parseInt(document.getElementById('cf-edit-index-m').value);
+    if (editIndex >= 0) contasFixas[editIndex] = conta;
+    else contasFixas.push(conta);
+    salvarFirebase('contasFixas', contasFixas);
+    document.getElementById('modalContaFixa').style.display = 'none';
+    renderContasFixas(); atualizarDashboard(); atualizarPagamentos();
+    atualizarSelectsPagamento();
+});
+
+window.addEventListener('click', e => { if (e.target == document.getElementById('modalContaFixa')) document.getElementById('modalContaFixa').style.display = 'none'; });
 
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('data').value = new Date().toISOString().split('T')[0];
