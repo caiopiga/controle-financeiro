@@ -194,6 +194,44 @@
         }
         .cfg-modal-close:hover { background: var(--bg-light); color: var(--text-dark); }
 
+        /* ===== TOOLTIPS APARTAMENTO ===== */
+        .apt-tooltip-wrap {
+            position: relative;
+            display: inline-block;
+            cursor: default;
+        }
+        .apt-tooltip-wrap .apt-tooltip {
+            visibility: hidden;
+            opacity: 0;
+            pointer-events: none;
+            position: absolute;
+            bottom: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f2937;
+            color: #fff;
+            padding: 0.65rem 0.9rem;
+            border-radius: 0.5rem;
+            font-size: 0.78rem;
+            white-space: nowrap;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+            z-index: 999;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
+            line-height: 1.6;
+        }
+        .apt-tooltip-wrap .apt-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: #1f2937;
+        }
+        .apt-tooltip-wrap:hover .apt-tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
         @media (max-width: 900px) { body { padding: 0.75rem; } .container { padding: 0; } .dashboard { flex-direction: column; } .card { min-width: 100%; } .tab { padding: 0.75rem 0.5rem; font-size: 0.85rem; } .resumo-cards { flex-direction: column; } .resumo-card { min-width: 100%; } }
         @media (max-width: 768px) { body { padding: 0.5rem; font-size: 0.9rem; } .header { padding: 1rem 1.5rem; } .header h1 { font-size: 1.35rem; } .tab-content { padding: 1rem; } .tab span { display: none; } .tab i { margin-right: 0; font-size: 1.2rem; } .form-row { flex-direction: column; } .form-group { min-width: 100%; } table { font-size: 0.85rem; } th, td { padding: 0.6rem 0.4rem; font-size: 0.85rem; } .modal-content { padding: 1.25rem; margin: 5% auto; width: 95%; } .card { padding: 1.25rem; } .card h3 { font-size: 1.25rem; } }
         @media (max-width: 480px) { body { padding: 0.25rem; } .header { padding: 0.75rem 1rem; margin-bottom: 1rem; } .header h1 { font-size: 1.15rem; } .tab-content { padding: 0.75rem; } .form-group { min-width: 100%; } input, select { padding: 0.65rem 0.85rem; font-size: 0.9rem; } button { padding: 0.65rem 1.25rem; font-size: 0.9rem; } .action-btn { padding: 0.3rem 0.45rem; font-size: 0.8rem; width: 2rem; height: 2rem; } table { display: block; overflow-x: auto; white-space: nowrap; font-size: 0.8rem; } th, td { padding: 0.5rem 0.35rem; font-size: 0.8rem; } .card { padding: 1rem; } .card h3 { font-size: 1.1rem; margin-bottom: 1rem; } .card-info { flex-direction: column; align-items: flex-start; gap: 0.25rem; } .resumo-icon { width: 40px; height: 40px; font-size: 1.1rem; } .resumo-value { font-size: 1.1rem; } .payment-option { font-size: 0.85rem; padding: 0.4rem 0.6rem; } }
@@ -445,21 +483,25 @@
     <div class="tab-content" id="apartamento420b">
         <h2><i class="fas fa-building"></i> Controle de Parcelas do Apartamento</h2>
         <div class="resumo-cards" style="margin-bottom:1.5rem;">
-            <div class="resumo-card">
+            <div class="resumo-card apt-tooltip-wrap">
                 <div class="resumo-icon" style="background-color:var(--success-color);"><i class="fas fa-check-circle"></i></div>
                 <div class="resumo-content"><span class="resumo-title">Parcelas Pagas</span><span class="resumo-value" id="parcelas-pagas">0</span></div>
+                <div class="apt-tooltip" id="tooltip-pagas">Carregando...</div>
             </div>
-            <div class="resumo-card">
+            <div class="resumo-card apt-tooltip-wrap">
                 <div class="resumo-icon" style="background-color:var(--warning-color);"><i class="fas fa-clock"></i></div>
                 <div class="resumo-content"><span class="resumo-title">Parcelas Pendentes</span><span class="resumo-value" id="parcelas-pendentes">0</span></div>
+                <div class="apt-tooltip" id="tooltip-pendentes">Carregando...</div>
             </div>
-            <div class="resumo-card">
+            <div class="resumo-card apt-tooltip-wrap">
                 <div class="resumo-icon" style="background-color:var(--primary-color);"><i class="fas fa-wallet"></i></div>
                 <div class="resumo-content"><span class="resumo-title">Total Pago</span><span class="resumo-value" id="total-pago-apt">R$ 0,00</span></div>
+                <div class="apt-tooltip" id="tooltip-total-pago">Carregando...</div>
             </div>
-            <div class="resumo-card">
+            <div class="resumo-card apt-tooltip-wrap">
                 <div class="resumo-icon" style="background-color:var(--danger-color);"><i class="fas fa-money-bill"></i></div>
                 <div class="resumo-content"><span class="resumo-title">Construção</span><span class="resumo-value" id="total-construcao-apt">0.000%</span></div>
+                <div class="apt-tooltip" id="tooltip-construcao">Carregando...</div>
             </div>
         </div>
         <table id="tabela-apartamento">
@@ -1594,10 +1636,24 @@ function atualizarTabelaApartamento() {
     const tbody = document.querySelector('#tabela-apartamento tbody');
     tbody.innerHTML = '';
     let pagas = 0, totalPago = 0, totalConstrucao = 0;
+    let pagasPuro = 0, pagasCury = 0, pagasEvolucao = 0;
+    let totalEntrada = 0, totalEvolucaoObra = 0;
+    let ultimaPendente = null;
+
     parcelasApartamento.forEach((p, i) => {
         const [ano, mes, dia] = p.data.split("-");
         const isPago = p.situacao === 'PAGO' || p.situacao === 'CURY CHEGA MAIS' || p.situacao === 'EVOLUÇÃO DE OBRA';
-        if (isPago) { pagas++; totalPago += p.parcelaTotal; }
+        if (isPago) {
+            pagas++;
+            totalPago += p.parcelaTotal;
+            totalEntrada += p.parcelaEntrada;
+            totalEvolucaoObra += p.evolucaoObra;
+            if (p.situacao === 'PAGO') pagasPuro++;
+            else if (p.situacao === 'CURY CHEGA MAIS') pagasCury++;
+            else if (p.situacao === 'EVOLUÇÃO DE OBRA') pagasEvolucao++;
+        } else {
+            ultimaPendente = p;
+        }
         totalConstrucao += p.construcao;
         const construcaoText = p.construcao > 0 ? p.construcao.toFixed(3) + '%' : '-';
         const tr = document.createElement('tr');
@@ -1612,10 +1668,47 @@ function atualizarTabelaApartamento() {
             </td>`;
         tbody.appendChild(tr);
     });
+
     document.getElementById('parcelas-pagas').textContent = pagas + ' / ' + parcelasApartamento.length;
     document.getElementById('parcelas-pendentes').textContent = parcelasApartamento.length - pagas;
     document.getElementById('total-pago-apt').textContent = formatarMoeda(totalPago);
     document.getElementById('total-construcao-apt').textContent = totalConstrucao.toFixed(3) + '%';
+
+    // ── Tooltip a) Parcelas Pagas ──
+    const ttPagas = document.getElementById('tooltip-pagas');
+    if (ttPagas) {
+        ttPagas.innerHTML =
+            `✅ Parcelas pagas: <strong>${pagasPuro}</strong><br>` +
+            `🏗️ Evolução de Obra: <strong>${pagasEvolucao}</strong><br>` +
+            `🏢 Cury Chega Mais: <strong>${pagasCury}</strong>`;
+    }
+
+    // ── Tooltip b) Parcelas Pendentes ──
+    const ttPendentes = document.getElementById('tooltip-pendentes');
+    if (ttPendentes) {
+        if (ultimaPendente) {
+            const [ap, mp, dp] = ultimaPendente.data.split("-");
+            ttPendentes.innerHTML = `📅 Quitação prevista: <strong>${dp}/${mp}/${ap}</strong>`;
+        } else {
+            ttPendentes.innerHTML = `🎉 Todas as parcelas estão quitadas!`;
+        }
+    }
+
+    // ── Tooltip c) Total Pago ──
+    const ttTotalPago = document.getElementById('tooltip-total-pago');
+    if (ttTotalPago) {
+        ttTotalPago.innerHTML =
+            `🏠 Parcela Entrada: <strong>${formatarMoeda(totalEntrada)}</strong><br>` +
+            `🏗️ Evolução de Obra: <strong>${formatarMoeda(totalEvolucaoObra)}</strong><br>` +
+            `💰 Total: <strong>${formatarMoeda(totalPago)}</strong>`;
+    }
+
+    // ── Tooltip d) Construção ──
+    const ttConstrucao = document.getElementById('tooltip-construcao');
+    if (ttConstrucao) {
+        const faltam = Math.max(0, 100 - totalConstrucao);
+        ttConstrucao.innerHTML = `⏳ Faltam <strong>${faltam.toFixed(3)}%</strong> para finalizar a construção`;
+    }
 }
 
 function ciclaSituacaoApt(index) {
