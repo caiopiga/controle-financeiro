@@ -1678,8 +1678,8 @@ function atualizarTabelaApartamento() {
     const ttPagas = document.getElementById('tooltip-pagas');
     if (ttPagas) {
         ttPagas.innerHTML =
-            `✅ Parcelas pagas: <strong>${pagasPuro}</strong><br>` +
-            `🏗️ Evolução de Obra: <strong>${pagasEvolucao}</strong><br>` +
+            `✅ Parcelas Pagas: <strong>${pagasPuro}</strong><br>` +
+            `🏗️ Parcelas Antecipadas: <strong>${pagasEvolucao}</strong><br>` +
             `🏢 Cury Chega Mais: <strong>${pagasCury}</strong>`;
     }
 
@@ -1688,7 +1688,7 @@ function atualizarTabelaApartamento() {
     if (ttPendentes) {
         if (ultimaPendente) {
             const [ap, mp, dp] = ultimaPendente.data.split("-");
-            ttPendentes.innerHTML = `📅 Quitação prevista: <strong>${dp}/${mp}/${ap}</strong>`;
+            ttPendentes.innerHTML = `📅 Quitação Prevista: <strong>${dp}/${mp}/${ap}</strong>`;
         } else {
             ttPendentes.innerHTML = `🎉 Todas as parcelas estão quitadas!`;
         }
@@ -1698,7 +1698,7 @@ function atualizarTabelaApartamento() {
     const ttTotalPago = document.getElementById('tooltip-total-pago');
     if (ttTotalPago) {
         ttTotalPago.innerHTML =
-            `🏠 Parcela Entrada: <strong>${formatarMoeda(totalEntrada)}</strong><br>` +
+            `🏠 Parcelas de Entrada: <strong>${formatarMoeda(totalEntrada)}</strong><br>` +
             `🏗️ Evolução de Obra: <strong>${formatarMoeda(totalEvolucaoObra)}</strong><br>` +
             `💰 Total: <strong>${formatarMoeda(totalPago)}</strong>`;
     }
