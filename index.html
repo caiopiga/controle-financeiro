@@ -1679,7 +1679,7 @@ function atualizarTabelaApartamento() {
     if (ttPagas) {
         ttPagas.innerHTML =
             `✅ Parcelas Pagas: <strong>${pagasPuro}</strong><br>` +
-            `🏗️ Parcelas Antecipadas: <strong>${pagasEvolucao}</strong><br>` +
+            `📄 Parcelas Antecipadas: <strong>${pagasEvolucao}</strong><br>` +
             `🏢 Cury Chega Mais: <strong>${pagasCury}</strong>`;
     }
 
@@ -1688,7 +1688,7 @@ function atualizarTabelaApartamento() {
     if (ttPendentes) {
         if (ultimaPendente) {
             const [ap, mp, dp] = ultimaPendente.data.split("-");
-            ttPendentes.innerHTML = `📅 Quitação Prevista: <strong>${dp}/${mp}/${ap}</strong>`;
+            ttPendentes.innerHTML = `📅 Última parcela em aberto: <strong>${dp}/${mp}/${ap}</strong>`;
         } else {
             ttPendentes.innerHTML = `🎉 Todas as parcelas estão quitadas!`;
         }
