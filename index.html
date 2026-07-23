@@ -1058,6 +1058,10 @@ function iniciarSincronizacao() {
     atualizarDashboard();
     atualizarPagamentos();
     atualizarTabelaApartamento();
+    if (window.__atalhoURLPendente) {
+        window.__atalhoURLPendente = false;
+        lancarViaURL();
+    }
     }, err => {
         document.getElementById('loading-overlay').style.display = 'none';
         setStatus('❌ Sem conexão', 'err');
@@ -2244,6 +2248,130 @@ document.getElementById('btn-salvar-conta-m').addEventListener('click', () => {
 });
 
 window.addEventListener('click', e => { if (e.target == document.getElementById('modalContaFixa')) document.getElementById('modalContaFixa').style.display = 'none'; });
+
+function lancarViaURL() {
+    const params = new URLSearchParams(window.location.search);
+    if (!params.has('atalho')) return;
+
+    const descricao = params.get('desc') || '';
+    const valor = (params.get('valor') || '').replace(',', '.');
+    const cartao = params.get('cartao') || '';
+    const dataHoje = new Date().toISOString().split('T')[0];
+
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.65);display:flex;align-items:center;justify-content:center;padding:1rem;';
+
+    overlay.innerHTML = `
+        <div style="background:#fff;border-radius:16px;padding:1.75rem;width:100%;max-width:400px;box-sizing:border-box;">
+            <div style="text-align:center;margin-bottom:1.25rem;">
+                <div style="font-size:2rem;">💳</div>
+                <h2 style="font-size:1.15rem;font-weight:700;color:#1f2937;margin:0.4rem 0 0.2rem;">Novo lançamento</h2>
+                <p style="color:#6b7280;font-size:0.82rem;margin:0;">Detectado via ${cartao || 'Cartão'}</p>
+            </div>
+            <div style="background:#f9fafb;border-radius:10px;padding:1.1rem;margin-bottom:1.1rem;border:1px solid #e5e7eb;">
+                <div style="margin-bottom:0.85rem;">
+                    <label style="font-size:0.75rem;font-weight:600;color:#6b7280;display:block;margin-bottom:0.3rem;">DESCRIÇÃO</label>
+                    <input id="al-desc" value="${descricao}" style="width:100%;padding:0.55rem 0.75rem;border:1px solid #d1d5db;border-radius:7px;font-size:0.92rem;color:#1f2937;box-sizing:border-box;">
+                </div>
+                <div style="display:flex;gap:0.65rem;margin-bottom:0.85rem;">
+                    <div style="flex:1;min-width:0;">
+                        <label style="font-size:0.75rem;font-weight:600;color:#6b7280;display:block;margin-bottom:0.3rem;">VALOR (R$)</label>
+                        <input id="al-valor" type="number" step="0.01" value="${valor}" style="width:100%;padding:0.55rem 0.75rem;border:1px solid #d1d5db;border-radius:7px;font-size:0.92rem;color:#1f2937;box-sizing:border-box;">
+                    </div>
+                    <div style="flex:1;min-width:0;">
+                        <label style="font-size:0.75rem;font-weight:600;color:#6b7280;display:block;margin-bottom:0.3rem;">DATA</label>
+                        <input id="al-data" type="date" value="${dataHoje}" style="width:100%;padding:0.55rem 0.4rem;border:1px solid #d1d5db;border-radius:7px;font-size:0.78rem;color:#1f2937;box-sizing:border-box;">
+                    </div>
+                </div>
+                <div style="margin-bottom:0.85rem;">
+                    <label style="font-size:0.75rem;font-weight:600;color:#6b7280;display:block;margin-bottom:0.3rem;">CATEGORIA</label>
+                    <select id="al-categoria" style="width:100%;padding:0.55rem 0.75rem;border:1px solid #d1d5db;border-radius:7px;font-size:0.92rem;color:#1f2937;box-sizing:border-box;">
+                        <option value="Alimentação">Alimentação</option>
+                        <option value="Transporte">Transporte</option>
+                        <option value="Saúde">Saúde</option>
+                        <option value="Lazer">Lazer</option>
+                        <option value="Educação">Educação</option>
+                        <option value="Outros">Outros</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size:0.75rem;font-weight:600;color:#6b7280;display:block;margin-bottom:0.3rem;">FORMA DE PAGAMENTO</label>
+                    <select id="al-pagamento" style="width:100%;padding:0.55rem 0.75rem;border:1px solid #d1d5db;border-radius:7px;font-size:0.92rem;color:#1f2937;box-sizing:border-box;">
+                        <option value="">Selecione</option>
+                    </select>
+                </div>
+            </div>
+            <div style="display:flex;gap:0.65rem;">
+                <button id="al-cancelar" style="flex:1;padding:0.8rem;background:#f3f4f6;color:#374151;border:none;border-radius:8px;font-size:0.9rem;font-weight:600;cursor:pointer;">✕ Cancelar</button>
+                <button id="al-aprovar" style="flex:2;padding:0.8rem;background:#6366f1;color:white;border:none;border-radius:8px;font-size:0.9rem;font-weight:700;cursor:pointer;">✓ Aprovar lançamento</button>
+            </div>
+            <div id="al-status" style="margin-top:0.65rem;text-align:center;font-size:0.82rem;color:#6b7280;display:none;"></div>
+        </div>`;
+
+    document.body.appendChild(overlay);
+
+    function popularPagamento() {
+        const sel = document.getElementById('al-pagamento');
+        if (!sel) return;
+        sel.innerHTML = '';
+        cartoes.forEach(c => {
+            const op = document.createElement('option');
+            op.value = 'Cartão ' + c.nome;
+            op.textContent = 'Cartão ' + c.nome;
+            if (cartao && c.nome.toLowerCase().includes(cartao.toLowerCase())) op.selected = true;
+            sel.appendChild(op);
+        });
+        ['PIX','Boleto','Débito Automático'].forEach(v => {
+            const op = document.createElement('option');
+            op.value = v; op.textContent = v;
+            sel.appendChild(op);
+        });
+    }
+
+    const tentarPopular = setInterval(() => {
+        if (cartoes.length > 0) { popularPagamento(); clearInterval(tentarPopular); }
+    }, 300);
+    setTimeout(() => clearInterval(tentarPopular), 6000);
+
+    document.getElementById('al-cancelar').onclick = () => overlay.remove();
+
+    document.getElementById('al-aprovar').onclick = async () => {
+        const btn = document.getElementById('al-aprovar');
+        const status = document.getElementById('al-status');
+        const descVal = document.getElementById('al-desc').value.trim();
+        const valorVal = parseFloat(document.getElementById('al-valor').value);
+        const dataVal = document.getElementById('al-data').value;
+        const catVal = document.getElementById('al-categoria').value;
+        const pagVal = document.getElementById('al-pagamento').value;
+
+        if (!descVal || !valorVal || !dataVal || !catVal || !pagVal) {
+            status.textContent = '⚠️ Preencha todos os campos.';
+            status.style.display = 'block';
+            return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = 'Salvando...';
+        status.style.display = 'none';
+
+        const lancamento = { tipo: 'Despesa', descricao: descVal, valor: valorVal, categoria: catVal, formaPagamento: pagVal, data: dataVal };
+
+        try {
+            lancamentos.push(lancamento);
+            await salvarFirebase('lancamentos', lancamentos);
+            btn.textContent = '✓ Lançado com sucesso!';
+            btn.style.background = '#22c55e';
+            setTimeout(() => { overlay.remove(); atualizarTabelaLancamentos(); atualizarDashboard(); }, 1500);
+        } catch(e) {
+            btn.disabled = false;
+            btn.textContent = '✓ Aprovar lançamento';
+            status.textContent = '❌ Erro ao salvar. Tente novamente.';
+            status.style.display = 'block';
+        }
+    };
+}
+
+window.__atalhoURLPendente = new URLSearchParams(window.location.search).has('atalho');
 
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('data').value = new Date().toISOString().split('T')[0];
