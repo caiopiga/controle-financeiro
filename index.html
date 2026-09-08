@@ -1806,85 +1806,77 @@ function emojiConta(nome) {
 
 function gerarRelatorioPagamento(dia) {
     let relatorio = '';
-    const faturaNubankVal = calcularFaturaNubank() + somaContasFixasCartao('Cartão Nubank');
-    const faturaInterVal = calcularFaturaInter() + somaContasFixasCartao('Cartão Inter');
-    const faturaSofisaVal = calcularFaturaSofisa();
     const fixas15 = somaContasFixasCiclo('dia15', true);
     const fixas30 = somaContasFixasCiclo('dia30', true);
-    const invest15 = (parseFloat(configuracoes.salario1) || 0) - fixas15 - faturaNubankVal;
-    const invest30 = (parseFloat(configuracoes.salario2) || 0) - fixas30 - faturaInterVal - faturaSofisaVal;
     const total15 = parseFloat(configuracoes.salario1) || 0;
     const total30 = parseFloat(configuracoes.salario2) || 0;
+
     if (dia === 15) {
+        const cartoesDia15 = cartoes.filter(c => c.ciclo === 'dia15');
+        const totalFaturas15 = cartoesDia15.reduce((t, c) => t + getFaturaCartao(c.nome), 0);
+        const invest15 = total15 - fixas15 - totalFaturas15;
+
         relatorio += `📊 *Pagamentos do dia 15:*\n\n`;
         contasFixas.filter(c => c.ciclo === 'dia15' && c.destaque).forEach(c => {
             relatorio += `${emojiConta(c.nome)} ${c.nome}: ${formatarMoeda(parseFloat(c.valor))}`;
-            if (c.pagamento === 'Boleto' && c.codbarras) {
-                relatorio += `\n   📋 Código: ${c.codbarras}`;
-            }
+            if (c.pagamento === 'Boleto' && c.codbarras) relatorio += `\n   📋 Código: ${c.codbarras}`;
             relatorio += `\n`;
         });
-        // Buscar nome do cartão dia15 nos cartoes cadastrados
-        const cartaoDia15 = cartoes.find(c => c.ciclo === 'dia15');
-        const nomeFatura15 = cartaoDia15 ? cartaoDia15.nome : 'Nubank';
-        relatorio += `💳 Fatura ${nomeFatura15}: ${formatarMoeda(faturaNubankVal)}\n`;
+        cartoesDia15.forEach(c => {
+            relatorio += `💳 Fatura ${c.nome}: ${formatarMoeda(getFaturaCartao(c.nome))}\n`;
+        });
         relatorio += `📈 Investir: ${formatarMoeda(invest15)}\n`;
         relatorio += `\n💰 *Total*: ${formatarMoeda(total15)}`;
-        const cartoesDia15 = cartoes.filter(c => c.ciclo === 'dia15').map(c => 'Cartão ' + c.nome);
-const nomesRemoverDia15 = [...new Set([...cartoesDia15, 'Cartão Nubank'])];
-lancamentos = lancamentos.filter(l => !nomesRemoverDia15.includes(l.formaPagamento));
-        // Baixa de parcelas: contas fixas parceladas pagas no cartão de crédito perdem 1 parcela a cada fechamento
+
+        const nomesRemoverDia15 = [...new Set([...cartoesDia15.map(c => 'Cartão ' + c.nome), 'Cartão Nubank'])];
+        lancamentos = lancamentos.filter(l => !nomesRemoverDia15.includes(l.formaPagamento));
+
         contasFixas.forEach(c => {
             if (c.ciclo === 'dia15' && c.prazo === 'parcelas' && c.pagamento && c.pagamento.startsWith('Cartão ')) {
                 c.parcelas = (parseInt(c.parcelas) || 1) - 1;
             }
         });
-        // Remove automaticamente as contas parceladas no cartão que zeraram as parcelas
         contasFixas = contasFixas.filter(c => !(c.prazo === 'parcelas' && c.pagamento && c.pagamento.startsWith('Cartão ') && parseInt(c.parcelas) <= 0));
-        // Excluir contas de data específica do ciclo dia15; zerar apenas as variáveis
         contasFixas = contasFixas.filter(c => !(c.ciclo === 'dia15' && c.prazo === 'personalizado'));
         contasFixas.forEach((c,i) => {
-            if (c.ciclo === 'dia15' && c.variavel === 'sim')
-                contasFixas[i].valor = 0;
+            if (c.ciclo === 'dia15' && c.variavel === 'sim') contasFixas[i].valor = 0;
         });
         salvarFirebase('contasFixas', contasFixas);
     }
+
     if (dia === 30) {
+        const cartoesDia30 = cartoes.filter(c => c.ciclo === 'dia30');
+        const totalFaturas30 = cartoesDia30.reduce((t, c) => t + getFaturaCartao(c.nome), 0);
+        const invest30 = total30 - fixas30 - totalFaturas30;
+
         relatorio += `📊 *Pagamentos do dia 30:*\n\n`;
         contasFixas.filter(c => c.ciclo === 'dia30' && c.destaque).forEach(c => {
             relatorio += `${emojiConta(c.nome)} ${c.nome}: ${formatarMoeda(parseFloat(c.valor))}`;
-            if (c.pagamento === 'Boleto' && c.codbarras) {
-                relatorio += `\n   📋 Código: ${c.codbarras}`;
-            }
+            if (c.pagamento === 'Boleto' && c.codbarras) relatorio += `\n   📋 Código: ${c.codbarras}`;
             relatorio += `\n`;
         });
-        // Buscar nomes dos cartões dia30
-        const cartoesDia30 = cartoes.filter(c => c.ciclo === 'dia30');
-        const nomeInter  = cartoesDia30.find(c => c.nome.toLowerCase().includes('inter'))?.nome  || 'Inter';
-        const nomeSofisa = cartoesDia30.find(c => c.nome.toLowerCase().includes('sofisa'))?.nome || 'Sofisa';
-        relatorio += `💳 Fatura ${nomeInter}: ${formatarMoeda(faturaInterVal)}\n`;
-        relatorio += `💳 Fatura ${nomeSofisa}: ${formatarMoeda(faturaSofisaVal)}\n`;
+        cartoesDia30.forEach(c => {
+            relatorio += `💳 Fatura ${c.nome}: ${formatarMoeda(getFaturaCartao(c.nome))}\n`;
+        });
         relatorio += `📈 Investir: ${formatarMoeda(invest30)}\n`;
         relatorio += `\n💰 *Total*: ${formatarMoeda(total30)}`;
-        const cartoesDia30 = cartoes.filter(c => c.ciclo === 'dia30').map(c => 'Cartão ' + c.nome);
-const nomesRemoverDia30 = [...new Set([...cartoesDia30, 'Cartão Inter', 'Cartão Sofisa'])];
-lancamentos = lancamentos.filter(l => !nomesRemoverDia30.includes(l.formaPagamento));
-        // Baixa de parcelas: contas fixas parceladas pagas no cartão de crédito perdem 1 parcela a cada fechamento
+
+        const nomesRemoverDia30 = [...new Set([...cartoesDia30.map(c => 'Cartão ' + c.nome), 'Cartão Inter', 'Cartão Sofisa'])];
+        lancamentos = lancamentos.filter(l => !nomesRemoverDia30.includes(l.formaPagamento));
+
         contasFixas.forEach(c => {
             if (c.ciclo === 'dia30' && c.prazo === 'parcelas' && c.pagamento && c.pagamento.startsWith('Cartão ')) {
                 c.parcelas = (parseInt(c.parcelas) || 1) - 1;
             }
         });
-        // Remove automaticamente as contas parceladas no cartão que zeraram as parcelas
         contasFixas = contasFixas.filter(c => !(c.prazo === 'parcelas' && c.pagamento && c.pagamento.startsWith('Cartão ') && parseInt(c.parcelas) <= 0));
-        // Excluir contas de data específica do ciclo dia30; zerar apenas as variáveis
         contasFixas = contasFixas.filter(c => !(c.ciclo === 'dia30' && c.prazo === 'personalizado'));
         contasFixas.forEach((c,i) => {
-            if (c.ciclo === 'dia30' && c.variavel === 'sim')
-                contasFixas[i].valor = 0;
+            if (c.ciclo === 'dia30' && c.variavel === 'sim') contasFixas[i].valor = 0;
         });
         salvarFirebase('contasFixas', contasFixas);
     }
+
     salvarFirebase('lancamentos', lancamentos);
     renderContasFixas();
     atualizarTabelaLancamentos(); atualizarDashboard(); atualizarPagamentos();
