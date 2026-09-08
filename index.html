@@ -1830,7 +1830,9 @@ function gerarRelatorioPagamento(dia) {
         relatorio += `💳 Fatura ${nomeFatura15}: ${formatarMoeda(faturaNubankVal)}\n`;
         relatorio += `📈 Investir: ${formatarMoeda(invest15)}\n`;
         relatorio += `\n💰 *Total*: ${formatarMoeda(total15)}`;
-        lancamentos = lancamentos.filter(l => l.formaPagamento !== 'Cartão Nubank');
+        const cartoesDia15 = cartoes.filter(c => c.ciclo === 'dia15').map(c => 'Cartão ' + c.nome);
+const nomesRemoverDia15 = [...new Set([...cartoesDia15, 'Cartão Nubank'])];
+lancamentos = lancamentos.filter(l => !nomesRemoverDia15.includes(l.formaPagamento));
         // Baixa de parcelas: contas fixas parceladas pagas no cartão de crédito perdem 1 parcela a cada fechamento
         contasFixas.forEach(c => {
             if (c.ciclo === 'dia15' && c.prazo === 'parcelas' && c.pagamento && c.pagamento.startsWith('Cartão ')) {
@@ -1864,7 +1866,9 @@ function gerarRelatorioPagamento(dia) {
         relatorio += `💳 Fatura ${nomeSofisa}: ${formatarMoeda(faturaSofisaVal)}\n`;
         relatorio += `📈 Investir: ${formatarMoeda(invest30)}\n`;
         relatorio += `\n💰 *Total*: ${formatarMoeda(total30)}`;
-        lancamentos = lancamentos.filter(l => l.formaPagamento !== 'Cartão Inter' && l.formaPagamento !== 'Cartão Sofisa');
+        const cartoesDia30 = cartoes.filter(c => c.ciclo === 'dia30').map(c => 'Cartão ' + c.nome);
+const nomesRemoverDia30 = [...new Set([...cartoesDia30, 'Cartão Inter', 'Cartão Sofisa'])];
+lancamentos = lancamentos.filter(l => !nomesRemoverDia30.includes(l.formaPagamento));
         // Baixa de parcelas: contas fixas parceladas pagas no cartão de crédito perdem 1 parcela a cada fechamento
         contasFixas.forEach(c => {
             if (c.ciclo === 'dia30' && c.prazo === 'parcelas' && c.pagamento && c.pagamento.startsWith('Cartão ')) {
